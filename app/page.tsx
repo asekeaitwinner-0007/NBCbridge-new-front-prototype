@@ -13,13 +13,13 @@ import {
   KeyRound,
   LayoutDashboard,
   Link2,
-  MoreHorizontal,
   Plus,
   Settings,
   ShieldCheck,
   Webhook,
   WalletCards
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Alert, Button, FieldPreview, SegmentedControl, StatusPill } from "../components/ui";
 import {
   attentionItems,
@@ -42,9 +42,22 @@ const tabs: { id: MerchantMode; label: string }[] = [
   { id: "attention", label: "Attention" }
 ];
 
-type Section = "dashboard" | "payments" | "links" | "wallets" | "integrations" | "api" | "settings";
+type Section = "dashboard" | "payments" | "links" | "wallets" | "api" | "billing" | "settings" | "integrations";
 type ActionModal = "create" | "connect-wallet" | "add-wallet" | null;
 type Language = "en" | "ru";
+
+const navItems: { id: Section; label: string; icon: LucideIcon; testId: string }[] = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, testId: "nav-dashboard" },
+  { id: "payments", label: "Payments", icon: CircleDollarSign, testId: "nav-payments" },
+  { id: "links", label: "Links", icon: Link2, testId: "nav-links" },
+  { id: "wallets", label: "Wallets", icon: WalletCards, testId: "nav-wallets" },
+  { id: "api", label: "API keys", icon: KeyRound, testId: "nav-api" },
+  { id: "billing", label: "Billing", icon: FileText, testId: "nav-billing" },
+  { id: "settings", label: "Settings", icon: Settings, testId: "nav-settings" },
+  { id: "integrations", label: "Integrations", icon: Webhook, testId: "nav-integrations" }
+];
+
+const mobileNavItems = navItems.filter((item) => ["dashboard", "payments", "links", "wallets", "api", "billing", "settings"].includes(item.id));
 
 const textOriginals = new WeakMap<Text, string>();
 const attrOriginals = new WeakMap<Element, Record<string, string>>();
@@ -57,6 +70,7 @@ const ruDictionary: Record<string, string> = {
   "More": "Еще",
   "Integrations": "Интеграции",
   "API keys": "API-ключи",
+  "Billing": "Оплата",
   "Settings": "Настройки",
   "Create": "Создать",
   "New": "Новый",
@@ -73,37 +87,41 @@ const ruDictionary: Record<string, string> = {
   "Wallet roles are explicit: access wallet and receiving wallets are not the same thing.": "Роли кошельков явные: кошелек доступа и кошельки приема платежей - не одно и то же.",
   "Integrations stay secondary until the merchant is ready for API or plugin work.": "Интеграции остаются вторичными, пока мерчант не готов к API или плагинам.",
   "API keys are powerful, but they should not distract from the first direct payment.": "API-ключи важны, но не должны отвлекать от первого прямого платежа.",
+  "Billing is a product state: show why live creation is blocked and how to continue.": "Оплата - это продуктовое состояние: покажите, почему создание платежей заблокировано и как продолжить.",
   "Settings hold preferences and optional customer-facing display details.": "В настройках находятся предпочтения и опциональные данные, видимые клиенту.",
-  "Live readiness": "Готовность к live",
+  "Live readiness": "Готовность к приему платежей",
   "What must be true before accepting payments": "Что должно быть готово перед приемом платежей",
   "Session": "Сессия",
   "Not signed": "Не подписано",
   "Bearer token active": "Bearer token активен",
-  "Connect login wallet to receive access token.": "Подключите login wallet, чтобы получить access token.",
+  "Connect login wallet to receive access token.": "Подключите кошелек входа, чтобы получить access token.",
   "Authorized requests use the dashboard access token.": "Авторизованные запросы используют access token кабинета.",
-  "Login wallet": "Login wallet",
-  "Identity wallet only. It is not automatically the settlement wallet.": "Это только кошелек идентификации. Он не становится settlement wallet автоматически.",
-  "Settlement wallet": "Settlement wallet",
+  "Login wallet": "Кошелек входа",
+  "Identity wallet only. It is not automatically the settlement wallet.": "Это только кошелек идентификации. Он не становится кошельком приема автоматически.",
+  "Settlement wallet": "Кошелек приема",
   "Pending verification": "Ожидает проверки",
   "USDT · Polygon verified": "USDT · Polygon проверен",
-  "Payment methods must explicitly choose where money arrives.": "Payment methods должны явно выбирать, куда приходят деньги.",
-  "Coins": "Coins",
+  "Payment methods must explicitly choose where money arrives.": "Платежные методы должны явно выбирать, куда приходят деньги.",
+  "Coins": "Активы",
   "Load after login": "Загрузка после входа",
   "USDT · Polygon available": "USDT · Polygon доступен",
-  "Coin labels include network. No bare USDT in creation forms.": "Названия coins включают сеть. В формах создания не должно быть просто USDT.",
-  "Live creation": "Live создание",
-  "Blocked by billing": "Заблокировано billing",
+  "Coin labels include network. No bare USDT in creation forms.": "Названия активов включают сеть. В формах создания не должно быть просто USDT.",
+  "Live creation": "Создание платежей",
+  "Blocked by billing": "Заблокировано оплатой",
   "Not ready": "Не готово",
   "Allowed": "Разрешено",
   "Handle 402 billing_required as product state.": "Обрабатывайте 402 billing_required как продуктовое состояние.",
   "Create actions still handle billing_required responses.": "Create actions всё равно обрабатывают billing_required responses.",
-  "Billing gate": "Billing gate",
+  "Billing gate": "Оплата подписки",
   "Free transactions left": "Бесплатных транзакций осталось",
   "canCreateLive": "canCreateLive",
   "after wallet": "после кошелька",
   "Billing required": "Требуется billing",
-  "New live payment methods should show a subscription CTA when backend returns 402 billing_required.": "Новые live payment methods должны показывать CTA на подписку, когда backend возвращает 402 billing_required.",
-  "If billing becomes required, creation stays visible but ends in a billing action instead of a generic error.": "Если billing становится обязательным, создание остается видимым, но приводит к billing-действию вместо generic error.",
+  "New live payment methods should show a subscription CTA when backend returns 402 billing_required.": "Новые платежные методы должны показывать CTA на подписку, когда backend возвращает 402 billing_required.",
+  "If billing becomes required, creation stays visible but ends in a billing action instead of a generic error.": "Если требуется оплата, создание остается видимым, но приводит к действию по оплате вместо обычной ошибки.",
+  "Switch language to English": "Переключить язык на английский",
+  "Switch language to Russian": "Переключить язык на русский",
+  "Create payment method or wallet": "Создать платежный метод или кошелек",
   "Prototype controls": "Контролы прототипа",
   "Merchant state: New": "Состояние мерчанта: Новый",
   "Merchant state: Ready": "Состояние мерчанта: Готов",
@@ -198,13 +216,16 @@ const ruDictionary: Record<string, string> = {
   "Create checkout without a business registration gate": "Создавайте checkout без обязательной бизнес-регистрации",
   "New link": "Новая ссылка",
   "Connect wallet before creating links": "Подключите кошелек перед созданием ссылок",
-  "The link form opens after the access wallet signs the workspace message.": "Форма ссылки откроется после подписи сообщения кошельком доступа.",
+  "The link form opens after the access wallet signs the workspace message and a receiving wallet is ready.": "Форма ссылки откроется после подписи сообщения кошельком доступа и подготовки кошелька приема.",
+  "Required next steps": "Следующие шаги",
+  "1. Connect access wallet": "1. Подключите кошелек доступа",
+  "2. Add receiving wallet": "2. Добавьте кошелек приема",
   "Open": "Открыть",
   "Payment details locked after first accepted payment": "Платежные детали заблокированы после первого принятого платежа",
-  "Payment method rule": "Правило payment method",
+  "Payment method rule": "Правило платежного метода",
   "Locked details": "Заблокированные детали",
   "After accepted payment": "После принятого платежа",
-  "Coin, network, amount and settlement wallet are locked. Safe fields like name, description and webhook can stay editable.": "Coin, сеть, сумма и settlement wallet заблокированы. Безопасные поля вроде названия, описания и webhook могут оставаться редактируемыми.",
+  "Coin, network, amount and settlement wallet are locked. Safe fields like name, description and webhook can stay editable.": "Актив, сеть, сумма и кошелек приема заблокированы. Безопасные поля вроде названия, описания и webhook могут оставаться редактируемыми.",
   "Optional display": "Опциональное отображение",
   "Customer trust": "Доверие клиента",
   "Company name": "Название компании",
@@ -252,6 +273,13 @@ const ruDictionary: Record<string, string> = {
   "not used": "не использовался",
   "Idempotency": "Идемпотентность",
   "Document key behavior near invoice creation.": "Опишите поведение ключей рядом с созданием invoice.",
+  "Subscription state controls live creation": "Состояние подписки управляет созданием платежей",
+  "When the backend returns 402 billing_required, the cabinet should show a subscription action instead of a technical error.": "Когда backend возвращает 402 billing_required, кабинет должен показать действие по подписке вместо технической ошибки.",
+  "Free limit": "Бесплатный лимит",
+  "trialSuccessLimit, trialSuccessCount and freeTransactionsLeft.": "trialSuccessLimit, trialSuccessCount и freeTransactionsLeft.",
+  "false blocks live payment methods and invoices until subscription is handled.": "false блокирует live-платежные методы и invoices до решения вопроса с подпиской.",
+  "Billing invoice": "Счет за подписку",
+  "Separate from buyer invoices. It pays for the platform subscription.": "Отдельно от счетов покупателей. Он оплачивает подписку на платформу.",
   "Preferences and customer-facing display details": "Предпочтения и данные, видимые клиенту",
   "Keep settings quiet. Business fields remain optional checkout presentation, not mandatory onboarding.": "Настройки должны быть спокойными. Бизнес-поля остаются опцией отображения в checkout, а не обязательным онбордингом.",
   "Language": "Язык",
@@ -364,6 +392,7 @@ export default function MerchantDashboardPrototype() {
     if (section === "wallets") return "Wallet roles are explicit: access wallet and receiving wallets are not the same thing.";
     if (section === "integrations") return "Integrations stay secondary until the merchant is ready for API or plugin work.";
     if (section === "api") return "API keys are powerful, but they should not distract from the first direct payment.";
+    if (section === "billing") return "Billing is a product state: show why live creation is blocked and how to continue.";
     if (section === "settings") return "Settings hold preferences and optional customer-facing display details.";
     if (mode === "new") return "Your merchant workspace is ready. Turn on payment acceptance in 3 steps.";
     if (mode === "ready") return "Wallets are ready. Create the first payment method and share checkout.";
@@ -385,6 +414,7 @@ export default function MerchantDashboardPrototype() {
         onSectionChange={setSection}
         section={section}
       />
+      <BottomNavigation section={section} onSectionChange={setSection} />
       <main className="page">
         <section className="hero-band">
           <div>
@@ -418,6 +448,7 @@ export default function MerchantDashboardPrototype() {
         {section === "wallets" ? <WalletsScreen mode={mode} onAddWallet={() => setActionModal("add-wallet")} onConnect={() => setActionModal("connect-wallet")} /> : null}
         {section === "integrations" ? <SecondaryScreen kind="integrations" /> : null}
         {section === "api" ? <SecondaryScreen kind="api" /> : null}
+        {section === "billing" ? <SecondaryScreen kind="billing" /> : null}
         {section === "settings" ? <SecondaryScreen kind="settings" /> : null}
 
         <PrototypeControls mode={mode} setMode={setMode} />
@@ -463,20 +494,6 @@ function Header({
   onLanguageChange: (language: Language) => void;
   onSectionChange: (section: Section) => void;
 }) {
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const nav = [
-    { id: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
-    { id: "payments" as const, label: "Payments", icon: CircleDollarSign },
-    { id: "links" as const, label: "Links", icon: Link2 },
-    { id: "wallets" as const, label: "Wallets", icon: WalletCards }
-  ];
-  const moreItems = [
-    { id: "integrations" as const, label: "Integrations", icon: Webhook },
-    { id: "api" as const, label: "API keys", icon: KeyRound },
-    { id: "settings" as const, label: "Settings", icon: Settings }
-  ];
-  const isMoreSection = moreItems.some((item) => item.id === section);
-
   return (
     <header className="topbar">
       <div className="topbar-inner">
@@ -489,66 +506,62 @@ function Header({
           <span>DEX</span>
         </div>
         <nav aria-label="Merchant navigation">
-          {nav.map((item) => (
+          {navItems.map((item) => (
             <button
+              aria-label={item.label}
               className={section === item.id ? "active" : ""}
+              data-testid={item.testId}
               key={item.label}
-              onClick={() => {
-                onSectionChange(item.id);
-                setIsMoreOpen(false);
-              }}
+              onClick={() => onSectionChange(item.id)}
               type="button"
             >
               <item.icon aria-hidden="true" size={16} strokeWidth={2.1} />
               <span>{item.label}</span>
             </button>
           ))}
-          <div className="more-nav">
-            <button
-              aria-expanded={isMoreOpen}
-              className={isMoreOpen || isMoreSection ? "active" : ""}
-              onClick={() => setIsMoreOpen((open) => !open)}
-              type="button"
-            >
-              <MoreHorizontal aria-hidden="true" size={16} strokeWidth={2.1} />
-              <span>More</span>
-            </button>
-            {isMoreOpen ? (
-              <div className="more-menu" role="menu">
-                {moreItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => {
-                      onSectionChange(item.id);
-                      setIsMoreOpen(false);
-                    }}
-                    role="menuitem"
-                    type="button"
-                  >
-                    <item.icon aria-hidden="true" size={16} strokeWidth={2.1} />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
         </nav>
         <div className="topbar-actions">
           <div className="language-switch" aria-label="Language">
-            <button className={language === "en" ? "selected" : ""} onClick={() => onLanguageChange("en")} type="button">
+            <button aria-label="Switch language to English" className={language === "en" ? "selected" : ""} data-testid="language-en" onClick={() => onLanguageChange("en")} type="button">
               EN
             </button>
-            <button className={language === "ru" ? "selected" : ""} onClick={() => onLanguageChange("ru")} type="button">
+            <button aria-label="Switch language to Russian" className={language === "ru" ? "selected" : ""} data-testid="language-ru" onClick={() => onLanguageChange("ru")} type="button">
               RU
             </button>
           </div>
           <span className={`workspace-state workspace-${mode}`}>{modeLabels[mode]}</span>
-          <Button icon={Plus} onClick={onCreate} size="md">
+          <Button aria-label="Create payment method or wallet" data-testid="create-primary" icon={Plus} onClick={onCreate} size="md">
             Create
           </Button>
         </div>
       </div>
     </header>
+  );
+}
+
+function BottomNavigation({
+  section,
+  onSectionChange
+}: {
+  section: Section;
+  onSectionChange: (section: Section) => void;
+}) {
+  return (
+    <nav aria-label="Mobile merchant navigation" className="bottom-nav">
+      {mobileNavItems.map((item) => (
+        <button
+          aria-label={item.label}
+          className={section === item.id ? "active" : ""}
+          data-testid={`mobile-${item.testId}`}
+          key={item.id}
+          onClick={() => onSectionChange(item.id)}
+          type="button"
+        >
+          <item.icon aria-hidden="true" size={18} strokeWidth={2.1} />
+          <span>{item.label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -613,7 +626,7 @@ function OperatingMetrics({ mode }: { mode: MerchantMode }) {
             <span>Volume</span>
             <h2>Direct payments trend</h2>
           </div>
-          <button className="filter-button" type="button">
+          <button aria-label="Select volume period" className="filter-button" data-testid="volume-period-filter" type="button">
             7 days
             <ChevronDown size={14} aria-hidden="true" />
           </button>
@@ -756,9 +769,9 @@ function RecentPayments({
           <h2>Recent payments</h2>
         </div>
         <div className="filters">
-          <button className="filter-button selected" type="button">Status</button>
-          <button className="filter-button" type="button">Currency</button>
-          <button className="filter-button" type="button">Date</button>
+          <button aria-label="Filter payments by status" className="filter-button selected" data-testid="payments-filter-status" type="button">Status</button>
+          <button aria-label="Filter payments by currency" className="filter-button" data-testid="payments-filter-currency" type="button">Currency</button>
+          <button aria-label="Filter payments by date" className="filter-button" data-testid="payments-filter-date" type="button">Date</button>
         </div>
       </div>
       {rows.length === 0 ? (
@@ -826,10 +839,10 @@ function PaymentsScreen({
             </div>
           </div>
           <div className="filter-stack">
-            <button className="filter-button selected" type="button">Status</button>
-            <button className="filter-button" type="button">Currency</button>
-            <button className="filter-button" type="button">Date</button>
-            <button className="filter-button" type="button">Links</button>
+            <button aria-label="Filter workbench by status" className="filter-button selected" data-testid="workbench-filter-status" type="button">Status</button>
+            <button aria-label="Filter workbench by currency" className="filter-button" data-testid="workbench-filter-currency" type="button">Currency</button>
+            <button aria-label="Filter workbench by date" className="filter-button" data-testid="workbench-filter-date" type="button">Date</button>
+            <button aria-label="Filter workbench by links" className="filter-button" data-testid="workbench-filter-links" type="button">Links</button>
           </div>
           <Alert title="Operational intent">
             This screen answers whether money arrived, what is pending, and which payments require manual review.
@@ -859,7 +872,7 @@ function TransactionModal({
       <section aria-modal="true" className="transaction-modal" role="dialog" aria-labelledby="transaction-modal-title">
         <header className="modal-header">
           <h2 id="transaction-modal-title">Transaction information</h2>
-          <button className="modal-close" onClick={onClose} type="button" aria-label="Close transaction information">
+          <button className="modal-close" data-testid="close-transaction-modal" onClick={onClose} type="button" aria-label="Close transaction information">
             <span aria-hidden="true">x</span>
           </button>
         </header>
@@ -916,7 +929,7 @@ function TransactionDetailSection({
                 <a href="#" onClick={(event) => event.preventDefault()}>
                   {maskValue(value)}
                 </a>
-                <button className="copy-mini" onClick={() => onCopy("Copied")} type="button" aria-label={`Copy ${label}`}>
+                <button className="copy-mini" data-testid={`copy-${label.toLowerCase().replaceAll(" ", "-")}`} onClick={() => onCopy("Copied")} type="button" aria-label={`Copy ${label}`}>
                   <Copy size={14} aria-hidden="true" />
                 </button>
               </span>
@@ -955,7 +968,11 @@ function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
             <div className="empty-state">
               <Link2 size={32} aria-hidden="true" />
               <strong>Connect wallet before creating links</strong>
-              <p>The link form opens after the access wallet signs the workspace message.</p>
+              <p>The link form opens after the access wallet signs the workspace message and a receiving wallet is ready.</p>
+              <div className="blocked-next-steps" aria-label="Required next steps">
+                <span>1. Connect access wallet</span>
+                <span>2. Add receiving wallet</span>
+              </div>
             </div>
           ) : (
             <div className="link-list">
@@ -1096,7 +1113,7 @@ function WalletsScreen({
   );
 }
 
-function SecondaryScreen({ kind }: { kind: "integrations" | "api" | "settings" }) {
+function SecondaryScreen({ kind }: { kind: "integrations" | "api" | "billing" | "settings" }) {
   const content = {
     integrations: {
       eyebrow: "Integrations",
@@ -1116,6 +1133,16 @@ function SecondaryScreen({ kind }: { kind: "integrations" | "api" | "settings" }
         ["Live key", "gw_live_12...89ab / last used 18 Jun"],
         ["Test key", "gw_test_45...02ef / not used"],
         ["Idempotency", "Document key behavior near invoice creation."]
+      ]
+    },
+    billing: {
+      eyebrow: "Billing",
+      title: "Subscription state controls live creation",
+      body: "When the backend returns 402 billing_required, the cabinet should show a subscription action instead of a technical error.",
+      cards: [
+        ["Free limit", "trialSuccessLimit, trialSuccessCount and freeTransactionsLeft."],
+        ["canCreateLive", "false blocks live payment methods and invoices until subscription is handled."],
+        ["Billing invoice", "Separate from buyer invoices. It pays for the platform subscription."]
       ]
     },
     settings: {
@@ -1170,7 +1197,7 @@ function ActionModalView({ kind, mode, onClose }: { kind: ActionModal; mode: Mer
       <section aria-modal="true" className="action-modal" role="dialog" aria-labelledby="action-modal-title">
         <header className="modal-header">
           <h2 id="action-modal-title">{title}</h2>
-          <button className="modal-close" onClick={onClose} type="button" aria-label={`Close ${title}`}>
+          <button className="modal-close" data-testid="close-action-modal" onClick={onClose} type="button" aria-label={`Close ${title}`}>
             <span aria-hidden="true">x</span>
           </button>
         </header>
@@ -1178,17 +1205,17 @@ function ActionModalView({ kind, mode, onClose }: { kind: ActionModal; mode: Mer
 
         {isCreate ? (
           <div className="action-grid">
-            <button className="action-card" disabled={mode === "new"} type="button">
+            <button aria-label="Create payment link" className="action-card" data-testid="create-payment-link" disabled={mode === "new"} type="button">
               <Link2 size={20} aria-hidden="true" />
               <strong>Payment link</strong>
               <span>Fixed or flexible hosted checkout link.</span>
             </button>
-            <button className="action-card" disabled={mode === "new"} type="button">
+            <button aria-label="Create invoice" className="action-card" data-testid="create-invoice" disabled={mode === "new"} type="button">
               <FileText size={20} aria-hidden="true" />
               <strong>Invoice</strong>
               <span>One-off payment request with amount and expiry.</span>
             </button>
-            <button className="action-card" type="button">
+            <button aria-label="Create receiving wallet" className="action-card" data-testid="create-receiving-wallet" type="button">
               <WalletCards size={20} aria-hidden="true" />
               <strong>Receiving wallet</strong>
               <span>Add a network-specific destination address.</span>
@@ -1221,7 +1248,7 @@ function ActionModalView({ kind, mode, onClose }: { kind: ActionModal; mode: Mer
 
 function CopyToast({ message, onDone }: { message: string; onDone: () => void }) {
   return (
-    <button className="copy-toast" onAnimationEnd={onDone} type="button">
+    <button aria-label={message} className="copy-toast" data-testid="copy-toast" onAnimationEnd={onDone} type="button">
       {message}
     </button>
   );
@@ -1239,7 +1266,7 @@ function CreatePanel({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
       </div>
       <div className="create-list">
         {createOptions.map((option) => (
-          <button className="create-option" disabled={disabled && option.label !== "Receiving wallet"} key={option.label} onClick={onCreate} type="button">
+          <button aria-label={`Create ${option.label}`} className="create-option" data-testid={`quick-create-${option.label.toLowerCase().replaceAll(" ", "-")}`} disabled={disabled && option.label !== "Receiving wallet"} key={option.label} onClick={onCreate} type="button">
             <option.icon size={18} aria-hidden="true" />
             <span>{option.label}</span>
             <ArrowRight size={16} aria-hidden="true" />
