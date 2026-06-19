@@ -590,21 +590,92 @@ button {
 
 .chart-bars {
   display: grid;
-  grid-template-columns: repeat(7, minmax(28px, 1fr));
+  grid-template-columns: repeat(7, minmax(42px, 1fr));
   align-items: end;
   gap: 14px;
-  height: 210px;
-  padding: 16px;
+  min-height: 240px;
+  padding: 16px 16px 12px;
   border-radius: 18px;
   background: linear-gradient(180deg, var(--gray-10), rgba(255, 255, 255, 0));
 }
 
-.chart-bars span {
+.chart-bars-today {
+  grid-template-columns: repeat(5, minmax(48px, 1fr));
+}
+
+.chart-bars-30d {
+  grid-template-columns: repeat(4, minmax(54px, 1fr));
+}
+
+.chart-bar-item {
+  display: grid;
+  grid-template-rows: 24px minmax(120px, 1fr) 20px;
+  align-items: end;
+  justify-items: center;
+  min-width: 0;
+  height: 100%;
+}
+
+.chart-bar {
   display: block;
+  width: min(92px, 82%);
   min-height: 16px;
   border-radius: 10px 10px 4px 4px;
   background: linear-gradient(180deg, var(--blue-primary) 0%, var(--blue) 100%);
   box-shadow: 0 8px 16px rgba(33, 155, 255, 0.16);
+}
+
+.chart-bar-value,
+.chart-bar-label {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--black-60);
+  font-size: 11px;
+  line-height: 120%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-bar-value {
+  align-self: start;
+  color: var(--black-primary);
+  font-weight: 600;
+}
+
+.period-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+  padding: 4px;
+  border: 1px solid var(--blue-15);
+  border-radius: 14px;
+  background: var(--blue-10);
+  box-shadow: var(--shadow-blue);
+}
+
+.period-selector button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: var(--black-60);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 120%;
+}
+
+.period-selector button.selected {
+  color: var(--white);
+  background: var(--blue);
+}
+
+.period-selector > span {
+  display: none;
 }
 
 .readiness-grid {
@@ -1755,8 +1826,32 @@ button {
 
   .chart-bars {
     gap: 8px;
-    height: 170px;
+    grid-template-columns: repeat(7, minmax(36px, 1fr));
+    min-height: 210px;
     padding: 12px;
+  }
+
+  .chart-bars-today {
+    grid-template-columns: repeat(5, minmax(38px, 1fr));
+  }
+
+  .chart-bars-30d {
+    grid-template-columns: repeat(4, minmax(42px, 1fr));
+  }
+
+  .chart-bar {
+    width: min(68px, 78%);
+  }
+
+  .period-selector {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .period-selector button {
+    flex: 1;
+    min-width: 0;
+    padding: 0 8px;
   }
 
   .modal-overlay {

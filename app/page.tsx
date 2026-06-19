@@ -45,6 +45,7 @@ const tabs: { id: MerchantMode; label: string }[] = [
 type Section = "dashboard" | "payments" | "links" | "wallets" | "api" | "billing" | "settings" | "integrations";
 type ActionModal = "create" | "connect-wallet" | "add-wallet" | null;
 type Language = "en" | "ru";
+type ChartPeriod = "today" | "7d" | "30d";
 
 const navItems: { id: Section; label: string; icon: LucideIcon; testId: string }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, testId: "nav-dashboard" },
@@ -169,7 +170,16 @@ const ruDictionary: Record<string, string> = {
   "Clear": "Чисто",
   "Volume": "Оборот",
   "Direct payments trend": "Динамика прямых платежей",
+  "Today": "Сегодня",
   "7 days": "7 дней",
+  "30 days": "30 дней",
+  "Volume period selector": "Выбор периода оборота",
+  "Show volume for Today": "Показать оборот за сегодня",
+  "Show volume for 7 days": "Показать оборот за 7 дней",
+  "Show volume for 30 days": "Показать оборот за 30 дней",
+  "Direct payment volume chart for Today": "График прямых платежей за сегодня",
+  "Direct payment volume chart for 7 days": "График прямых платежей за 7 дней",
+  "Direct payment volume chart for 30 days": "График прямых платежей за 30 дней",
   "Operations": "Операции",
   "What happens next": "Что дальше",
   "Needs attention": "Требует внимания",
@@ -604,12 +614,44 @@ function SetupPanel({ mode, onContinue }: { mode: MerchantMode; onContinue: () =
 }
 
 function OperatingMetrics({ mode }: { mode: MerchantMode }) {
+  const [period, setPeriod] = useState<ChartPeriod>("7d");
   const metrics = [
     { label: "Today volume", value: mode === "attention" ? "370 USDT" : "1,250 USDT", delta: "+18% vs yesterday" },
     { label: "7 day volume", value: "8,420 USDT", delta: "+11% vs previous" },
     { label: "Active links", value: "4", delta: "2 used today" },
     { label: "Pending amount", value: mode === "attention" ? "195 USDT" : "0 USDT", delta: mode === "attention" ? "Needs action" : "Clear" }
   ];
+  const periodOptions: { id: ChartPeriod; label: string }[] = [
+    { id: "today", label: "Today" },
+    { id: "7d", label: "7 days" },
+    { id: "30d", label: "30 days" }
+  ];
+  const chartData: Record<ChartPeriod, { label: string; value: number; amount: string }[]> = {
+    today: [
+      { label: "08:00", value: 26, amount: "90" },
+      { label: "10:00", value: 44, amount: "150" },
+      { label: "12:00", value: 38, amount: "130" },
+      { label: "14:00", value: 62, amount: "210" },
+      { label: "16:00", value: mode === "attention" ? 54 : 78, amount: mode === "attention" ? "185" : "265" }
+    ],
+    "7d": [
+      { label: "Mon", value: 32, amount: "410" },
+      { label: "Tue", value: 58, amount: "740" },
+      { label: "Wed", value: 45, amount: "570" },
+      { label: "Thu", value: 66, amount: "840" },
+      { label: "Fri", value: 74, amount: "950" },
+      { label: "Sat", value: 52, amount: "660" },
+      { label: "Sun", value: mode === "attention" ? 88 : 80, amount: mode === "attention" ? "1,120" : "1,020" }
+    ],
+    "30d": [
+      { label: "W1", value: 46, amount: "2.1k" },
+      { label: "W2", value: 64, amount: "2.9k" },
+      { label: "W3", value: 57, amount: "2.6k" },
+      { label: "W4", value: mode === "attention" ? 72 : 81, amount: mode === "attention" ? "3.3k" : "3.7k" }
+    ]
+  };
+  const bars = chartData[period];
+  const selectedPeriod = periodOptions.find((item) => item.id === period)?.label ?? "7 days";
 
   return (
     <section className="metrics-grid" aria-label="Operating metrics">
@@ -626,14 +668,33 @@ function OperatingMetrics({ mode }: { mode: MerchantMode }) {
             <span>Volume</span>
             <h2>Direct payments trend</h2>
           </div>
-          <button aria-label="Select volume period" className="filter-button" data-testid="volume-period-filter" type="button">
-            7 days
-            <ChevronDown size={14} aria-hidden="true" />
-          </button>
+          <div className="period-selector" aria-label="Volume period selector" data-testid="volume-period-selector">
+            {periodOptions.map((option) => (
+              <button
+                aria-label={`Show volume for ${option.label}`}
+                aria-pressed={period === option.id}
+                className={period === option.id ? "selected" : ""}
+                data-testid={`volume-period-${option.id}`}
+                key={option.id}
+                onClick={() => setPeriod(option.id)}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
+            <span aria-hidden="true">
+              {selectedPeriod}
+              <ChevronDown size={14} aria-hidden="true" />
+            </span>
+          </div>
         </div>
-        <div className="chart-bars" aria-label="Mock direct payment volume chart">
-          {[32, 58, 45, 66, 74, 52, mode === "attention" ? 88 : 80].map((height, index) => (
-            <span key={index} style={{ height: `${height}%` }} />
+        <div className={`chart-bars chart-bars-${period}`} aria-label={`Direct payment volume chart for ${selectedPeriod}`}>
+          {bars.map((bar) => (
+            <div className="chart-bar-item" key={bar.label}>
+              <span className="chart-bar-value">{bar.amount}</span>
+              <span className="chart-bar" style={{ height: `${bar.value}%` }} />
+              <span className="chart-bar-label">{bar.label}</span>
+            </div>
           ))}
         </div>
       </article>
