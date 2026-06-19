@@ -21,7 +21,8 @@ export type SetupStep = {
 
 export type PaymentRow = {
   product: string;
-  channel: "hosted link" | "payform" | "mpos" | "api" | "dashboard" | "manual";
+  sourceKind: "hosted_link" | "payform" | "mpos" | "api" | "dashboard" | "manual";
+  channel: "hosted_link" | "payform" | "mpos" | "api" | "dashboard" | "manual";
   network: string;
   payer: string;
   receiver: string;
@@ -131,7 +132,8 @@ export const setupStepsByMode: Record<MerchantMode, SetupStep[]> = {
 export const payments: PaymentRow[] = [
   {
     product: "Paylink / Storefront USDT",
-    channel: "hosted link",
+    sourceKind: "hosted_link",
+    channel: "hosted_link",
     network: "Polygon",
     payer: "0x9a41a1dcb282110f4c02",
     receiver: "0x79c2f064d44c2cbef42a",
@@ -142,6 +144,7 @@ export const payments: PaymentRow[] = [
   },
   {
     product: "Invoice / Order 1042",
+    sourceKind: "dashboard",
     channel: "dashboard",
     network: "Polygon",
     payer: "0x8371cf6b30a8410fd981",
@@ -154,6 +157,7 @@ export const payments: PaymentRow[] = [
   },
   {
     product: "Paylink / Event pass",
+    sourceKind: "payform",
     channel: "payform",
     network: "Polygon",
     payer: "0x6cf3e18c9501a7d94202",
@@ -165,6 +169,7 @@ export const payments: PaymentRow[] = [
   },
   {
     product: "Invoice / Order 1037",
+    sourceKind: "mpos",
     channel: "mpos",
     network: "Polygon",
     payer: "0x3b78fd121c3f4b601adc",

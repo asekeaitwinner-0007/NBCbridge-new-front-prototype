@@ -66,6 +66,18 @@ const mobileNavItems = navItems.filter((item) => ["dashboard", "payments", "link
 const textOriginals = new WeakMap<Text, string>();
 const attrOriginals = new WeakMap<Element, Record<string, string>>();
 
+function formatChannel(channel: PaymentRow["channel"]) {
+  const labels: Record<PaymentRow["channel"], string> = {
+    dashboard: "Dashboard",
+    api: "Merchant API",
+    hosted_link: "Hosted PayLink",
+    payform: "Payform",
+    mpos: "mPOS",
+    manual: "Manual"
+  };
+  return labels[channel];
+}
+
 const ruDictionary: Record<string, string> = {
   "Dashboard": "Дашборд",
   "Payments": "Платежи",
@@ -432,8 +444,42 @@ const ruDictionary: Record<string, string> = {
   "Filter workbench by asset": "Фильтровать рабочую зону по активу",
   "Filter workbench by wallet": "Фильтровать рабочую зону по кошельку",
   "Filter workbench by tx hash": "Фильтровать рабочую зону по tx hash",
-  "Production filters are backend-side: status, channel, network, asset, wallet, tx hash, date range and pagination.": "Production-фильтры работают на backend: статус, канал, сеть, актив, кошелек, tx hash, диапазон дат и pagination.",
-  "Production payment error states": "Production-состояния ошибок платежа"
+  "Production filters are backend-side: status, sourceKind, channel, payLinkId, coinId, chainId, amount range, wallet, tx hash, dates, limit and offset.": "Production-фильтры работают на backend: status, sourceKind, channel, payLinkId, coinId, chainId, диапазон суммы, wallet, tx hash, даты, limit и offset.",
+  "Production payment error states": "Production-состояния ошибок платежа",
+  "Hosted PayLink": "Hosted PayLink",
+  "Merchant API": "Merchant API",
+  "Manual": "Ручной",
+  "Source kind": "Тип источника",
+  "paymentDetailsLocked": "paymentDetailsLocked",
+  "true after observed payment": "true после принятого платежа",
+  "lockedReason": "lockedReason",
+  "hasAcceptedPayments": "hasAcceptedPayments",
+  "Backend list contract": "Backend-контракт списка",
+  "PayLink filters": "Фильтры PayLink",
+  "Filter paylinks by search": "Фильтровать PayLinks по поиску",
+  "Filter paylinks by status": "Фильтровать PayLinks по статусу",
+  "Filter paylinks by coin": "Фильтровать PayLinks по coinId",
+  "Filter paylinks by chain": "Фильтровать PayLinks по chainId",
+  "Filter paylinks by amount mode": "Фильтровать PayLinks по режиму суммы",
+  "Filter paylinks by created date": "Фильтровать PayLinks по дате создания",
+  "Include inactive paylinks": "Включить inactive PayLinks",
+  "Control paylink pagination": "Управлять pagination PayLinks",
+  "Backend returns active PayLinks by default. Archived or inactive lists must request status=0, includeInactive=1 or includeDisabled=1.": "Backend по умолчанию возвращает active PayLinks. Для архива или inactive нужно запрашивать status=0, includeInactive=1 или includeDisabled=1.",
+  "Search invoices by uuid order or tx": "Искать invoices по uuid, order или tx",
+  "Filter workbench by source kind": "Фильтровать рабочую зону по sourceKind",
+  "Filter workbench by paylink id": "Фильтровать рабочую зону по payLinkId",
+  "Filter workbench by amount range": "Фильтровать рабочую зону по диапазону суммы",
+  "Filter workbench by created date": "Фильтровать рабочую зону по дате создания",
+  "Filter workbench by confirmed date": "Фильтровать рабочую зону по дате подтверждения",
+  "Success rule": "Правило success",
+  "Show success only when invoice status is confirmed. pending, detected, aml_pending, needs_review and aml_hold stay in intermediate states.": "Показывайте success только при статусе invoice confirmed. pending, detected, aml_pending, needs_review и aml_hold остаются промежуточными состояниями.",
+  "Public checkout contract": "Контракт public checkout",
+  "GET /public/invoices/:uuid/payment-request": "GET /public/invoices/:uuid/payment-request",
+  "walletAction.available=false is not an error": "walletAction.available=false не является ошибкой",
+  "manualDetails is the direct-route fallback": "manualDetails - fallback для direct-route",
+  "Shareable hosted payment page. Creates invoices with kind=checkout.": "Публичная hosted-страница оплаты. Создает invoices с kind=checkout.",
+  "Embed code generated from backend link settings. Creates invoices with kind=payform.": "Код встраивания из backend-настроек ссылки. Создает invoices с kind=payform.",
+  "Terminal mode for in-person payments. Creates invoices with kind=mpos.": "Терминальный режим для очной оплаты. Создает invoices с kind=mpos."
 };
 
 function applyLanguage(root: HTMLElement | null, language: Language) {
@@ -955,7 +1001,7 @@ function RecentPayments({
           {rows.map((row) => (
             <div className="payment-row" key={`${row.product}-${row.date}`}>
               <strong>{row.product}</strong>
-              <span>{row.channel}</span>
+              <span>{formatChannel(row.channel)}</span>
               <span>{row.network}</span>
               <span>{maskValue(row.payer)} <ArrowRight size={12} aria-hidden="true" /> {maskValue(row.receiver)}</span>
               <StatusPill status={row.status} />
@@ -1000,16 +1046,21 @@ function PaymentsScreen({
             </div>
           </div>
           <div className="filter-stack">
-            <button aria-label="Filter workbench by status" className="filter-button selected" data-testid="workbench-filter-status" type="button">Status</button>
+            <button aria-label="Search invoices by uuid order or tx" className="filter-button selected" data-testid="workbench-filter-search" type="button">q / search</button>
+            <button aria-label="Filter workbench by status" className="filter-button" data-testid="workbench-filter-status" type="button">Status</button>
+            <button aria-label="Filter workbench by source kind" className="filter-button" data-testid="workbench-filter-source-kind" type="button">sourceKind</button>
             <button aria-label="Filter workbench by channel" className="filter-button" data-testid="workbench-filter-channel" type="button">Channel</button>
+            <button aria-label="Filter workbench by paylink id" className="filter-button" data-testid="workbench-filter-paylink-id" type="button">payLinkId</button>
             <button aria-label="Filter workbench by network" className="filter-button" data-testid="workbench-filter-network" type="button">Network</button>
             <button aria-label="Filter workbench by asset" className="filter-button" data-testid="workbench-filter-asset" type="button">Asset</button>
+            <button aria-label="Filter workbench by amount range" className="filter-button" data-testid="workbench-filter-amount-range" type="button">amountMin / amountMax</button>
             <button aria-label="Filter workbench by wallet" className="filter-button" data-testid="workbench-filter-wallet" type="button">Wallet</button>
             <button aria-label="Filter workbench by tx hash" className="filter-button" data-testid="workbench-filter-tx-hash" type="button">TX hash</button>
-            <button aria-label="Filter workbench by date" className="filter-button" data-testid="workbench-filter-date" type="button">Date</button>
+            <button aria-label="Filter workbench by created date" className="filter-button" data-testid="workbench-filter-created-date" type="button">createdFrom / createdTo</button>
+            <button aria-label="Filter workbench by confirmed date" className="filter-button" data-testid="workbench-filter-confirmed-date" type="button">confirmedFrom / confirmedTo</button>
           </div>
           <Alert title="Operational intent">
-            Production filters are backend-side: status, channel, network, asset, wallet, tx hash, date range and pagination.
+            Production filters are backend-side: status, sourceKind, channel, payLinkId, coinId, chainId, amount range, wallet, tx hash, dates, limit and offset.
           </Alert>
           <div className="code-list" aria-label="Production payment error states">
             <span>settlement_wallet_not_verified</span>
@@ -1018,6 +1069,9 @@ function PaymentsScreen({
             <span>payment_details_locked</span>
             <span>invoice_expired</span>
           </div>
+          <Alert title="Success rule">
+            Show success only when invoice status is confirmed. pending, detected, aml_pending, needs_review and aml_hold stay in intermediate states.
+          </Alert>
         </section>
         <CreatePanel mode={mode} onCreate={onCreate} />
       </aside>
@@ -1054,7 +1108,8 @@ function TransactionModal({
             title="Seller information"
             rows={[
               ["Product", payment.product],
-              ["Channel", payment.channel],
+              ["Channel", formatChannel(payment.channel)],
+              ["Source kind", payment.sourceKind],
               ["Transaction type", "Payment"],
               ["Status", payment.status],
               ["Receiver wallet", payment.receiver, "wallet"],
@@ -1118,9 +1173,9 @@ function TransactionDetailSection({
 function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => void }) {
   const disabled = mode === "new";
   const linkRows = mode === "new" ? [] : [
-    { name: "Storefront USDT", network: "USDT · Polygon", amount: "250 USDT", wallet: "0x79c2f064d44c2cbef42a", status: "locked", locked: true },
-    { name: "Event pass", network: "USDT · Polygon", amount: "75 USDT", wallet: "0x91d5a7f6ea8064d11d29", status: mode === "attention" ? "warning" : "active", locked: false },
-    { name: "Open amount checkout", network: "USDT · Polygon", amount: "Flexible", wallet: "0x79c2f064d44c2cbef42a", status: "active", locked: false }
+    { name: "Storefront USDT", network: "USDT · Polygon", amount: "250 USDT", amountMode: "fixed", wallet: "0x79c2f064d44c2cbef42a", status: "locked", locked: true },
+    { name: "Event pass", network: "USDT · Polygon", amount: "75 USDT", amountMode: "fixed", wallet: "0x91d5a7f6ea8064d11d29", status: mode === "attention" ? "warning" : "active", locked: false },
+    { name: "Open amount checkout", network: "USDT · Polygon", amount: "Flexible", amountMode: "flexible", wallet: "0x79c2f064d44c2cbef42a", status: "active", locked: false }
   ];
 
   return (
@@ -1152,7 +1207,7 @@ function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
                 <div className="link-row" key={link.name}>
                   <div>
                     <strong>{link.name}</strong>
-                    <span>{link.network} / {link.amount}</span>
+                    <span>{link.network} / {link.amount} / {link.amountMode}</span>
                   </div>
                   <code>{maskValue(link.wallet)}</code>
                   <StatusPill status={link.status as "locked" | "warning" | "active"} />
@@ -1188,6 +1243,27 @@ function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
           <Alert title="After accepted payment">
             Coin, network, amount and settlement wallet are locked. Safe fields like name, description and webhook can stay editable.
           </Alert>
+          <FieldPreview label="paymentDetailsLocked" value="true after observed payment" />
+          <FieldPreview label="lockedReason" value="hasAcceptedPayments" />
+        </section>
+        <section className="panel side-panel">
+          <div className="section-heading compact">
+            <div>
+              <span>Backend list contract</span>
+              <h2>PayLink filters</h2>
+            </div>
+          </div>
+          <div className="filter-stack">
+            <button aria-label="Filter paylinks by search" className="filter-button selected" data-testid="paylinks-filter-search" type="button">q / search</button>
+            <button aria-label="Filter paylinks by status" className="filter-button" data-testid="paylinks-filter-status" type="button">status</button>
+            <button aria-label="Filter paylinks by coin" className="filter-button" data-testid="paylinks-filter-coin" type="button">coinId</button>
+            <button aria-label="Filter paylinks by chain" className="filter-button" data-testid="paylinks-filter-chain" type="button">chainId</button>
+            <button aria-label="Filter paylinks by amount mode" className="filter-button" data-testid="paylinks-filter-amount-mode" type="button">amountMode</button>
+            <button aria-label="Filter paylinks by created date" className="filter-button" data-testid="paylinks-filter-created-date" type="button">createdFrom / createdTo</button>
+            <button aria-label="Include inactive paylinks" className="filter-button" data-testid="paylinks-filter-include-inactive" type="button">includeInactive</button>
+            <button aria-label="Control paylink pagination" className="filter-button" data-testid="paylinks-filter-pagination" type="button">limit / offset</button>
+          </div>
+          <p className="side-note">Backend returns active PayLinks by default. Archived or inactive lists must request status=0, includeInactive=1 or includeDisabled=1.</p>
         </section>
         <WalletPanel mode={mode} onAddWallet={() => onCreate()} />
       </aside>
@@ -1620,6 +1696,12 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
               <code>{checkoutUrl}</code>
               <Button kind="secondary" size="sm" icon={Copy}>Copy link</Button>
             </div>
+            <div className="code-list" aria-label="Public checkout contract">
+              <span>POST /public/paylinks/:uuid/invoices {isInvoice ? "kind=dashboard" : "kind=checkout"}</span>
+              <span>GET /public/invoices/:uuid/payment-request</span>
+              <span>walletAction.available=false is not an error</span>
+              <span>manualDetails is the direct-route fallback</span>
+            </div>
             <div className="result-actions">
               <Button size="md" icon={ExternalLink}>Open checkout</Button>
               <Button kind="alternative" size="md" onClick={() => {
@@ -1634,15 +1716,15 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
               <div className="usage-options">
                 <article>
                   <strong>Paylink</strong>
-                  <span>Shareable hosted payment page.</span>
+                  <span>Shareable hosted payment page. Creates invoices with kind=checkout.</span>
                 </article>
                 <article>
                   <strong>Payform</strong>
-                  <span>Embed code generated from backend link settings.</span>
+                  <span>Embed code generated from backend link settings. Creates invoices with kind=payform.</span>
                 </article>
                 <article>
                   <strong>mPOS</strong>
-                  <span>Terminal mode for in-person payments.</span>
+                  <span>Terminal mode for in-person payments. Creates invoices with kind=mpos.</span>
                 </article>
               </div>
             ) : (
