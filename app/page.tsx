@@ -74,6 +74,36 @@ const ruDictionary: Record<string, string> = {
   "Integrations stay secondary until the merchant is ready for API or plugin work.": "Интеграции остаются вторичными, пока мерчант не готов к API или плагинам.",
   "API keys are powerful, but they should not distract from the first direct payment.": "API-ключи важны, но не должны отвлекать от первого прямого платежа.",
   "Settings hold preferences and optional customer-facing display details.": "В настройках находятся предпочтения и опциональные данные, видимые клиенту.",
+  "Live readiness": "Готовность к live",
+  "What must be true before accepting payments": "Что должно быть готово перед приемом платежей",
+  "Session": "Сессия",
+  "Not signed": "Не подписано",
+  "Bearer token active": "Bearer token активен",
+  "Connect login wallet to receive access token.": "Подключите login wallet, чтобы получить access token.",
+  "Authorized requests use the dashboard access token.": "Авторизованные запросы используют access token кабинета.",
+  "Login wallet": "Login wallet",
+  "Identity wallet only. It is not automatically the settlement wallet.": "Это только кошелек идентификации. Он не становится settlement wallet автоматически.",
+  "Settlement wallet": "Settlement wallet",
+  "Pending verification": "Ожидает проверки",
+  "USDT · Polygon verified": "USDT · Polygon проверен",
+  "Payment methods must explicitly choose where money arrives.": "Payment methods должны явно выбирать, куда приходят деньги.",
+  "Coins": "Coins",
+  "Load after login": "Загрузка после входа",
+  "USDT · Polygon available": "USDT · Polygon доступен",
+  "Coin labels include network. No bare USDT in creation forms.": "Названия coins включают сеть. В формах создания не должно быть просто USDT.",
+  "Live creation": "Live создание",
+  "Blocked by billing": "Заблокировано billing",
+  "Not ready": "Не готово",
+  "Allowed": "Разрешено",
+  "Handle 402 billing_required as product state.": "Обрабатывайте 402 billing_required как продуктовое состояние.",
+  "Create actions still handle billing_required responses.": "Create actions всё равно обрабатывают billing_required responses.",
+  "Billing gate": "Billing gate",
+  "Free transactions left": "Бесплатных транзакций осталось",
+  "canCreateLive": "canCreateLive",
+  "after wallet": "после кошелька",
+  "Billing required": "Требуется billing",
+  "New live payment methods should show a subscription CTA when backend returns 402 billing_required.": "Новые live payment methods должны показывать CTA на подписку, когда backend возвращает 402 billing_required.",
+  "If billing becomes required, creation stays visible but ends in a billing action instead of a generic error.": "Если billing становится обязательным, создание остается видимым, но приводит к billing-действию вместо generic error.",
   "Prototype controls": "Контролы прототипа",
   "Merchant state: New": "Состояние мерчанта: Новый",
   "Merchant state: Ready": "Состояние мерчанта: Готов",
@@ -126,17 +156,18 @@ const ruDictionary: Record<string, string> = {
   "What happens next": "Что дальше",
   "Needs attention": "Требует внимания",
   "View all": "Смотреть все",
-  "Pending invoice is aging": "Invoice долго в ожидании",
-  "Order 1042 has no detected transfer after 34 minutes.": "По заказу 1042 перевод не найден уже 34 минуты.",
-  "Wallet verification expires soon": "Проверка кошелька скоро истечет",
-  "Receiving wallet 0x91d5...1d29 needs a signature to stay usable.": "Кошельку приема 0x91d5...1d29 нужна подпись, чтобы остаться доступным.",
-  "Webhook delivery recovered": "Доставка webhook восстановлена",
-  "Last retry was delivered. Keep this item visible until the next clean event.": "Последняя повторная отправка доставлена. Оставьте пункт видимым до следующего чистого события.",
+  "Detected payment is waiting confirmations": "Найденный платеж ждет подтверждений",
+  "Order 1042 has a transaction on-chain, but only 1 of 12 confirmations.": "По заказу 1042 транзакция найдена on-chain, но есть только 1 из 12 подтверждений.",
+  "Billing limit blocks live creation": "Billing limit блокирует live создание",
+  "Free successful transactions are exhausted. New live payment methods need subscription billing.": "Бесплатные успешные транзакции закончились. Новым live payment methods нужна подписка.",
+  "Settlement wallet verification expires soon": "Проверка settlement wallet скоро истечет",
+  "Receiving wallet 0x91d5...1d29 needs a signature to stay usable for live routing.": "Кошельку приема 0x91d5...1d29 нужна подпись, чтобы остаться доступным для live routing.",
   "No action required": "Действия не требуются",
   "Open payments and wallet verifications are clear.": "Открытые платежи и проверки кошельков чистые.",
   "Transactions": "Транзакции",
   "Recent payments": "Недавние платежи",
   "Status": "Статус",
+  "Detected": "Найден",
   "Currency": "Валюта",
   "Date": "Дата",
   "Product": "Продукт",
@@ -159,6 +190,9 @@ const ruDictionary: Record<string, string> = {
   "Payer wallet": "Кошелек плательщика",
   "Waiting for transfer": "Ожидаем перевод",
   "Date and time": "Дата и время",
+  "Confirmations": "Подтверждения",
+  "Not required": "Не требуется",
+  "1 / 12 confirmations": "1 / 12 подтверждений",
   "Copied": "Скопировано",
   "Payment links": "Платежные ссылки",
   "Create checkout without a business registration gate": "Создавайте checkout без обязательной бизнес-регистрации",
@@ -166,6 +200,11 @@ const ruDictionary: Record<string, string> = {
   "Connect wallet before creating links": "Подключите кошелек перед созданием ссылок",
   "The link form opens after the access wallet signs the workspace message.": "Форма ссылки откроется после подписи сообщения кошельком доступа.",
   "Open": "Открыть",
+  "Payment details locked after first accepted payment": "Платежные детали заблокированы после первого принятого платежа",
+  "Payment method rule": "Правило payment method",
+  "Locked details": "Заблокированные детали",
+  "After accepted payment": "После принятого платежа",
+  "Coin, network, amount and settlement wallet are locked. Safe fields like name, description and webhook can stay editable.": "Coin, сеть, сумма и settlement wallet заблокированы. Безопасные поля вроде названия, описания и webhook могут оставаться редактируемыми.",
   "Optional display": "Опциональное отображение",
   "Customer trust": "Доверие клиента",
   "Company name": "Название компании",
@@ -176,6 +215,8 @@ const ruDictionary: Record<string, string> = {
   "Access and receiving wallets": "Кошелек доступа и кошельки приема",
   "Add receiving wallet": "Добавить кошелек приема",
   "Access wallet": "Кошелек доступа",
+  "Default settlement wallet": "Settlement wallet по умолчанию",
+  "Secondary settlement wallet": "Дополнительный settlement wallet",
   "Not connected": "Не подключен",
   "This wallet signs in and controls workspace access. It does not have to be the same address that receives payments.": "Этот кошелек входит в кабинет и управляет доступом. Он не обязан совпадать с адресом приема платежей.",
   "Connect wallet": "Подключить кошелек",
@@ -359,11 +400,13 @@ export default function MerchantDashboardPrototype() {
           <section className="workspace-grid">
             <div className="main-column">
               {isSetupMode ? <SetupPanel mode={mode} onContinue={() => setActionModal("connect-wallet")} /> : <OperatingMetrics mode={mode} />}
+              <ReadinessPanel mode={mode} />
               <AttentionPanel items={modeAttentionItems} mode={mode} />
               <RecentPayments rows={modePayments} onCopy={setCopyToast} onSelect={setSelectedPayment} />
             </div>
             <aside className="side-column">
               <CreatePanel mode={mode} onCreate={() => setActionModal("create")} />
+              <BillingPanel mode={mode} />
               <WalletPanel mode={mode} onAddWallet={() => setActionModal("add-wallet")} />
               <CustomerIdentityPanel />
             </aside>
@@ -585,6 +628,90 @@ function OperatingMetrics({ mode }: { mode: MerchantMode }) {
   );
 }
 
+function ReadinessPanel({ mode }: { mode: MerchantMode }) {
+  const isNew = mode === "new";
+  const isAttention = mode === "attention";
+  const rows = [
+    {
+      label: "Session",
+      value: isNew ? "Not signed" : "Bearer token active",
+      status: isNew ? "warning" : "success",
+      detail: isNew ? "Connect login wallet to receive access token." : "Authorized requests use the dashboard access token."
+    },
+    {
+      label: "Login wallet",
+      value: isNew ? "Missing" : "0x79c2...42aa",
+      status: isNew ? "warning" : "success",
+      detail: "Identity wallet only. It is not automatically the settlement wallet."
+    },
+    {
+      label: "Settlement wallet",
+      value: isNew ? "Missing" : isAttention ? "Pending verification" : "USDT · Polygon verified",
+      status: isNew || isAttention ? "warning" : "success",
+      detail: "Payment methods must explicitly choose where money arrives."
+    },
+    {
+      label: "Coins",
+      value: isNew ? "Load after login" : "USDT · Polygon available",
+      status: isNew ? "info" : "success",
+      detail: "Coin labels include network. No bare USDT in creation forms."
+    },
+    {
+      label: "Live creation",
+      value: isAttention ? "Blocked by billing" : isNew ? "Not ready" : "Allowed",
+      status: isAttention ? "danger" : isNew ? "warning" : "success",
+      detail: isAttention ? "Handle 402 billing_required as product state." : "Create actions still handle billing_required responses."
+    }
+  ];
+
+  return (
+    <section className="panel readiness-panel">
+      <div className="section-heading">
+        <div>
+          <span>Live readiness</span>
+          <h2>What must be true before accepting payments</h2>
+        </div>
+      </div>
+      <div className="readiness-grid">
+        {rows.map((row) => (
+          <article className="readiness-card" key={row.label}>
+            <div>
+              <span>{row.label}</span>
+              <StatusPill status={row.status as "success" | "warning" | "danger" | "info"} />
+            </div>
+            <strong>{row.value}</strong>
+            <p>{row.detail}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BillingPanel({ mode }: { mode: MerchantMode }) {
+  const blocked = mode === "attention";
+  return (
+    <section className="panel side-panel">
+      <div className="section-heading compact">
+        <div>
+          <span>Billing gate</span>
+          <h2>Live creation</h2>
+        </div>
+        <StatusPill status={blocked ? "danger" : mode === "new" ? "warning" : "success"} />
+      </div>
+      <FieldPreview label="Free transactions left" value={blocked ? "0" : mode === "new" ? "5" : "3"} />
+      <FieldPreview label="canCreateLive" value={blocked ? "false" : mode === "new" ? "after wallet" : "true"} />
+      {blocked ? (
+        <Alert tone="warning" title="Billing required">
+          New live payment methods should show a subscription CTA when backend returns 402 billing_required.
+        </Alert>
+      ) : (
+        <p className="side-note">If billing becomes required, creation stays visible but ends in a billing action instead of a generic error.</p>
+      )}
+    </section>
+  );
+}
+
 function AttentionPanel({ items, mode }: { items: AttentionItem[]; mode: MerchantMode }) {
   return (
     <section className="panel">
@@ -658,7 +785,7 @@ function RecentPayments({
               <span>{row.network}</span>
               <span>{maskValue(row.payer)} <ArrowRight size={12} aria-hidden="true" /> {maskValue(row.receiver)}</span>
               <StatusPill status={row.status} />
-              <span>{row.tx ? maskValue(row.tx) : "Waiting"}</span>
+              <span>{row.confirmations ? row.confirmations : row.tx ? maskValue(row.tx) : "Waiting"}</span>
               <span>{row.date}</span>
               <strong>{row.amount}</strong>
               <button className="icon-action" onClick={() => onSelect(row)} type="button" aria-label={`Open ${row.product} details`}>
@@ -747,7 +874,8 @@ function TransactionModal({
               ["Status", payment.status],
               ["Receiver wallet", payment.receiver, "wallet"],
               ["Network", payment.network],
-              ["Amount", payment.amount]
+              ["Amount", payment.amount],
+              ["Confirmations", payment.confirmations || "Not required"]
             ]}
           />
           <TransactionDetailSection
@@ -805,9 +933,9 @@ function TransactionDetailSection({
 function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => void }) {
   const disabled = mode === "new";
   const linkRows = mode === "new" ? [] : [
-    { name: "Storefront USDT", network: "Polygon", amount: "250 USDT", wallet: "0x79c2f064d44c2cbef42a", status: "active" },
-    { name: "Event pass", network: "Polygon", amount: "75 USDT", wallet: "0x91d5a7f6ea8064d11d29", status: mode === "attention" ? "review" : "active" },
-    { name: "Open amount checkout", network: "Polygon", amount: "Flexible", wallet: "0x79c2f064d44c2cbef42a", status: "active" }
+    { name: "Storefront USDT", network: "USDT · Polygon", amount: "250 USDT", wallet: "0x79c2f064d44c2cbef42a", status: "locked", locked: true },
+    { name: "Event pass", network: "USDT · Polygon", amount: "75 USDT", wallet: "0x91d5a7f6ea8064d11d29", status: mode === "attention" ? "warning" : "active", locked: false },
+    { name: "Open amount checkout", network: "USDT · Polygon", amount: "Flexible", wallet: "0x79c2f064d44c2cbef42a", status: "active", locked: false }
   ];
 
   return (
@@ -838,8 +966,9 @@ function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
                     <span>{link.network} / {link.amount}</span>
                   </div>
                   <code>{maskValue(link.wallet)}</code>
-                  <StatusPill status={link.status === "review" ? "review" : "active"} />
+                  <StatusPill status={link.status as "locked" | "warning" | "active"} />
                   <Button kind="secondary" size="sm">Open</Button>
+                  {link.locked ? <small className="link-lock-note">Payment details locked after first accepted payment</small> : null}
                 </div>
               ))}
             </div>
@@ -858,6 +987,18 @@ function LinksScreen({ mode, onCreate }: { mode: MerchantMode; onCreate: () => v
           <FieldPreview label="Company name" value="Optional" />
           <FieldPreview label="Receipt contact" value="Optional" />
           <p className="side-note">These fields improve checkout clarity but never block direct payment creation.</p>
+        </section>
+        <section className="panel side-panel">
+          <div className="section-heading compact">
+            <div>
+              <span>Payment method rule</span>
+              <h2>Locked details</h2>
+            </div>
+            <StatusPill status="locked" />
+          </div>
+          <Alert title="After accepted payment">
+            Coin, network, amount and settlement wallet are locked. Safe fields like name, description and webhook can stay editable.
+          </Alert>
         </section>
         <WalletPanel mode={mode} onAddWallet={() => onCreate()} />
       </aside>

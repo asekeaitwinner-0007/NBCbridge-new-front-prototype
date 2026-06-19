@@ -575,6 +575,49 @@ button {
   box-shadow: 0 8px 16px rgba(33, 155, 255, 0.16);
 }
 
+.readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.readiness-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 142px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--gray-10);
+}
+
+.readiness-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.readiness-card span {
+  color: var(--black-60);
+  font-size: 12px;
+  line-height: 120%;
+}
+
+.readiness-card strong {
+  color: var(--black-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 120%;
+}
+
+.readiness-card p {
+  margin: 0;
+  color: var(--black-60);
+  font-size: 12px;
+  line-height: 140%;
+}
+
 .attention-list,
 .wallet-list,
 .create-list,
@@ -759,6 +802,13 @@ button {
   font-family: "Commissioner", ui-sans-serif, system-ui, sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.link-lock-note {
+  grid-column: 1 / -1;
+  color: var(--black-60);
+  font-size: 11px;
+  line-height: 120%;
 }
 
 .wallet-role-grid {
@@ -1113,21 +1163,30 @@ button {
 }
 
 .status-pending,
+.status-detected,
 .status-warning {
   color: #a66d00;
   background: #fdf0d6;
 }
 
 .status-expired,
+.status-failed,
 .status-danger {
   color: var(--error-red);
   background: var(--light-red);
 }
 
 .status-review,
+.status-needs_review,
+.status-locked,
 .status-info {
   color: var(--blue);
   background: var(--blue-10);
+}
+
+.status-disabled {
+  color: var(--black-40);
+  background: var(--gray-10);
 }
 
 .filters {
@@ -1493,6 +1552,7 @@ button {
 
   .step-grid,
   .metrics-grid,
+  .readiness-grid,
   .side-column,
   .side-column.single,
   .wallet-role-grid,

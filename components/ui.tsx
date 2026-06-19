@@ -21,14 +21,34 @@ export function Button({ kind = "primary", size = "lg", icon: Icon, children, cl
   );
 }
 
-export function StatusPill({ status }: { status: "confirmed" | "pending" | "expired" | "review" | "active" | "verified" | "success" | "warning" | "danger" | "info" }) {
+type StatusName =
+  | "pending"
+  | "detected"
+  | "confirmed"
+  | "expired"
+  | "needs_review"
+  | "failed"
+  | "active"
+  | "verified"
+  | "disabled"
+  | "locked"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export function StatusPill({ status }: { status: StatusName }) {
   const labelMap: Record<typeof status, string> = {
-    confirmed: "Confirmed",
     pending: "Pending",
+    detected: "Detected",
+    confirmed: "Confirmed",
     expired: "Expired",
-    review: "Review",
+    needs_review: "Review",
+    failed: "Failed",
     active: "Active",
     verified: "Verified",
+    disabled: "Disabled",
+    locked: "Locked",
     success: "Clear",
     warning: "Warning",
     danger: "Action",

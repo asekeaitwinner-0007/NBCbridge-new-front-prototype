@@ -24,10 +24,11 @@ export type PaymentRow = {
   network: string;
   payer: string;
   receiver: string;
-  status: "confirmed" | "pending" | "expired" | "review";
+  status: "pending" | "detected" | "confirmed" | "expired" | "needs_review" | "failed";
   tx: string;
   date: string;
   amount: string;
+  confirmations?: string;
 };
 
 export type AttentionItem = {
@@ -142,17 +143,18 @@ export const payments: PaymentRow[] = [
     network: "Polygon",
     payer: "0x8371cf6b30a8410fd981",
     receiver: "0x79c2f064d44c2cbef42a",
-    status: "pending",
-    tx: "",
+    status: "detected",
+    tx: "0x8df5e4dba13af25fcaf91f74291c0a9fbcd1f4b2",
     date: "18 Jun, 16:12",
-    amount: "120 USDT"
+    amount: "120 USDT",
+    confirmations: "1 / 12 confirmations"
   },
   {
     product: "Paylink / Event pass",
     network: "Polygon",
     payer: "0x6cf3e18c9501a7d94202",
     receiver: "0x91d5a7f6ea8064d11d29",
-    status: "review",
+    status: "needs_review",
     tx: "0xac1cb727967318d10d7adeb9c641f8e8c04912d8",
     date: "18 Jun, 14:08",
     amount: "75 USDT"
@@ -171,19 +173,19 @@ export const payments: PaymentRow[] = [
 
 export const attentionItems: AttentionItem[] = [
   {
-    title: "Pending invoice is aging",
-    detail: "Order 1042 has no detected transfer after 34 minutes.",
+    title: "Detected payment is waiting confirmations",
+    detail: "Order 1042 has a transaction on-chain, but only 1 of 12 confirmations.",
+    severity: "info" as const
+  },
+  {
+    title: "Billing limit blocks live creation",
+    detail: "Free successful transactions are exhausted. New live payment methods need subscription billing.",
     severity: "warning" as const
   },
   {
-    title: "Wallet verification expires soon",
-    detail: "Receiving wallet 0x91d5...1d29 needs a signature to stay usable.",
+    title: "Settlement wallet verification expires soon",
+    detail: "Receiving wallet 0x91d5...1d29 needs a signature to stay usable for live routing.",
     severity: "danger" as const
-  },
-  {
-    title: "Webhook delivery recovered",
-    detail: "Last retry was delivered. Keep this item visible until the next clean event.",
-    severity: "info" as const
   }
 ];
 
@@ -197,21 +199,21 @@ export const emptyAttentionItems: AttentionItem[] = [
 
 export const walletRows = [
   {
-    role: "Access wallet",
+    role: "Login wallet",
     address: "0x79c2f064d44c2cbef42a",
     network: "Ethereum signature",
     status: "active"
   },
   {
-    role: "Default receiving wallet",
+    role: "Default settlement wallet",
     address: "0x79c2f064d44c2cbef42a",
-    network: "Polygon USDT",
+    network: "USDT · Polygon",
     status: "verified"
   },
   {
-    role: "Secondary receiving wallet",
+    role: "Secondary settlement wallet",
     address: "0x91d5a7f6ea8064d11d29",
-    network: "Polygon USDT",
+    network: "USDT · Polygon",
     status: "pending"
   }
 ];
