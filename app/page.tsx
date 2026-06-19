@@ -342,6 +342,12 @@ const ruDictionary: Record<string, string> = {
   "Open amount checkout": "Checkout с открытой суммой",
   "Paylink creation": "Создание PayLink",
   "Payment link created": "Платежная ссылка создана",
+  "PayLink created": "PayLink создан",
+  "Invoice created": "Инвойс создан",
+  "Create PayLink": "Создать PayLink",
+  "Create invoice": "Создать инвойс",
+  "Invoice / pre-transfer creation": "Создание Invoice / pre-transfer",
+  "Invoice / pre-transfer": "Invoice / pre-transfer",
   "Close create payment link flow": "Закрыть создание платежной ссылки",
   "Create paylink steps": "Шаги создания PayLink",
   "Type": "Тип",
@@ -358,10 +364,12 @@ const ruDictionary: Record<string, string> = {
   "Choose plan": "Выбрать план",
   "Select reusable payment link": "Выбрать многоразовую платежную ссылку",
   "Reusable payment link": "Многоразовая платежная ссылка",
+  "Reusable PayLink": "Многоразовый PayLink",
   "Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.": "Подходит для сайта, повторных платежей, донатов, mPOS и платежной формы. Ссылку можно использовать повторно.",
   "Select one-time invoice": "Выбрать разовый инвойс",
   "One-time invoice": "Разовый инвойс",
   "Use it for a single payment. The invoice expires after a set time or after payment.": "Подходит для одного платежа. Инвойс закрывается после оплаты или истечения срока.",
+  "Use it for a single payment attempt. It expires after a set time or after payment confirmation.": "Подходит для одной попытки оплаты. Истекает через заданное время или после подтверждения платежа.",
   "Invoice name": "Название инвойса",
   "Link name": "Название ссылки",
   "Example: SaaS license payment": "Например: оплата SaaS-лицензии",
@@ -380,16 +388,21 @@ const ruDictionary: Record<string, string> = {
   "After expiration, this invoice no longer accepts payment. The payment method itself is not deleted.": "После истечения срока инвойс больше не принимает оплату. Сам платежный метод не удаляется.",
   "0x79c2...42aa / USDT · Polygon / added 18 Jun": "0x79c2...42aa / USDT · Polygon / добавлен 18 июня",
   "0x91d5...1d29 / USDT · Polygon / pending verification": "0x91d5...1d29 / USDT · Polygon / ожидает проверки",
+  "0x91d5...1d29 / USDT · Polygon / pending verification · cannot be used for live payments": "0x91d5...1d29 / USDT · Polygon / ожидает проверки · нельзя использовать для live-платежей",
+  "Secondary receiving wallet pending verification": "Дополнительный кошелек приема ожидает проверки",
   "Connect in this browser": "Подключить в этом браузере",
   "Use wallet signature to verify the receiving address.": "Подпишите сообщение кошельком, чтобы подтвердить адрес приема.",
   "Request remote approval": "Запросить удаленное подтверждение",
   "Enter an address and send the owner a verification request.": "Введите адрес и отправьте владельцу запрос на подтверждение.",
   "For USDT · Polygon, use a Polygon/EVM address. Do not send TRON, Ethereum Mainnet or other networks to this payment.": "Для USDT · Polygon используйте Polygon/EVM-адрес. Не отправляйте TRON, Ethereum Mainnet или другие сети на этот платеж.",
+  "Need another receiving wallet?": "Нужен другой кошелек приема?",
+  "Add it in the wallet verification flow first. Manual address entry creates a pending wallet and cannot be used for live payments until verified.": "Сначала добавьте его через flow проверки кошелька. Ручной ввод адреса создает pending wallet, который нельзя использовать для live-платежей до проверки.",
   "Review before create": "Проверка перед созданием",
   "Name": "Название",
   "Amount mode": "Режим суммы",
   "What will be created": "Что будет создано",
   "A one-time invoice will be created with a limited lifetime.": "Будет создан разовый инвойс с ограниченным сроком действия.",
+  "An Invoice / pre-transfer will be created with a fixed amount, TTL and dashboard channel.": "Будет создан Invoice / pre-transfer с фиксированной суммой, TTL и каналом dashboard.",
   "A reusable PayLink will be created with hosted checkout, Payform and mPOS usage options.": "Будет создан многоразовый PayLink с hosted checkout, Payform и mPOS-сценариями.",
   "Checkout preview": "Предпросмотр платежной страницы",
   "Untitled payment": "Платеж без названия",
@@ -409,7 +422,18 @@ const ruDictionary: Record<string, string> = {
   "Embed code generated from backend link settings.": "Код встраивания формируется из настроек ссылки на backend.",
   "mPOS": "mPOS",
   "Terminal mode for in-person payments.": "Терминальный режим для очной оплаты.",
-  "This one-time invoice expires in 30 minutes and closes after payment or expiration.": "Этот разовый инвойс истекает через 30 минут и закрывается после оплаты или истечения срока."
+  "This one-time invoice expires in 30 minutes and closes after payment or expiration.": "Этот разовый инвойс истекает через 30 минут и закрывается после оплаты или истечения срока.",
+  "This invoice expires in 30 minutes and stays pending until backend confirms network, asset, amount, recipient and confirmations.": "Этот инвойс истекает через 30 минут и остается pending, пока backend не подтвердит сеть, актив, сумму, получателя и confirmations.",
+  "Demo data": "Демо-данные",
+  "Channel": "Канал",
+  "Filter payments by channel": "Фильтровать платежи по каналу",
+  "Filter workbench by channel": "Фильтровать рабочую зону по каналу",
+  "Filter workbench by network": "Фильтровать рабочую зону по сети",
+  "Filter workbench by asset": "Фильтровать рабочую зону по активу",
+  "Filter workbench by wallet": "Фильтровать рабочую зону по кошельку",
+  "Filter workbench by tx hash": "Фильтровать рабочую зону по tx hash",
+  "Production filters are backend-side: status, channel, network, asset, wallet, tx hash, date range and pagination.": "Production-фильтры работают на backend: статус, канал, сеть, актив, кошелек, tx hash, диапазон дат и pagination.",
+  "Production payment error states": "Production-состояния ошибок платежа"
 };
 
 function applyLanguage(root: HTMLElement | null, language: Language) {
@@ -739,6 +763,7 @@ function OperatingMetrics({ mode }: { mode: MerchantMode }) {
             <span>Volume</span>
             <h2>Direct payments trend</h2>
           </div>
+          <span className="demo-data-pill">Demo data</span>
           <div className="period-selector" aria-label="Volume period selector" data-testid="volume-period-selector">
             {periodOptions.map((option) => (
               <button
@@ -901,7 +926,9 @@ function RecentPayments({
           <h2>Recent payments</h2>
         </div>
         <div className="filters">
+          {rows.length > 0 ? <span className="demo-data-pill">Demo data</span> : null}
           <button aria-label="Filter payments by status" className="filter-button selected" data-testid="payments-filter-status" type="button">Status</button>
+          <button aria-label="Filter payments by channel" className="filter-button" data-testid="payments-filter-channel" type="button">Channel</button>
           <button aria-label="Filter payments by currency" className="filter-button" data-testid="payments-filter-currency" type="button">Currency</button>
           <button aria-label="Filter payments by date" className="filter-button" data-testid="payments-filter-date" type="button">Date</button>
         </div>
@@ -916,6 +943,7 @@ function RecentPayments({
         <div className="payment-table">
           <div className="payment-row header-row">
             <span>Product</span>
+            <span>Channel</span>
             <span>Network</span>
             <span>Wallets</span>
             <span>Status</span>
@@ -927,6 +955,7 @@ function RecentPayments({
           {rows.map((row) => (
             <div className="payment-row" key={`${row.product}-${row.date}`}>
               <strong>{row.product}</strong>
+              <span>{row.channel}</span>
               <span>{row.network}</span>
               <span>{maskValue(row.payer)} <ArrowRight size={12} aria-hidden="true" /> {maskValue(row.receiver)}</span>
               <StatusPill status={row.status} />
@@ -972,13 +1001,23 @@ function PaymentsScreen({
           </div>
           <div className="filter-stack">
             <button aria-label="Filter workbench by status" className="filter-button selected" data-testid="workbench-filter-status" type="button">Status</button>
-            <button aria-label="Filter workbench by currency" className="filter-button" data-testid="workbench-filter-currency" type="button">Currency</button>
+            <button aria-label="Filter workbench by channel" className="filter-button" data-testid="workbench-filter-channel" type="button">Channel</button>
+            <button aria-label="Filter workbench by network" className="filter-button" data-testid="workbench-filter-network" type="button">Network</button>
+            <button aria-label="Filter workbench by asset" className="filter-button" data-testid="workbench-filter-asset" type="button">Asset</button>
+            <button aria-label="Filter workbench by wallet" className="filter-button" data-testid="workbench-filter-wallet" type="button">Wallet</button>
+            <button aria-label="Filter workbench by tx hash" className="filter-button" data-testid="workbench-filter-tx-hash" type="button">TX hash</button>
             <button aria-label="Filter workbench by date" className="filter-button" data-testid="workbench-filter-date" type="button">Date</button>
-            <button aria-label="Filter workbench by links" className="filter-button" data-testid="workbench-filter-links" type="button">Links</button>
           </div>
           <Alert title="Operational intent">
-            This screen answers whether money arrived, what is pending, and which payments require manual review.
+            Production filters are backend-side: status, channel, network, asset, wallet, tx hash, date range and pagination.
           </Alert>
+          <div className="code-list" aria-label="Production payment error states">
+            <span>settlement_wallet_not_verified</span>
+            <span>coin_disabled</span>
+            <span>amount_above_max</span>
+            <span>payment_details_locked</span>
+            <span>invoice_expired</span>
+          </div>
         </section>
         <CreatePanel mode={mode} onCreate={onCreate} />
       </aside>
@@ -1015,6 +1054,7 @@ function TransactionModal({
             title="Seller information"
             rows={[
               ["Product", payment.product],
+              ["Channel", payment.channel],
               ["Transaction type", "Payment"],
               ["Status", payment.status],
               ["Receiver wallet", payment.receiver, "wallet"],
@@ -1321,12 +1361,17 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
   const billingBlocked = mode === "attention";
   const canCreate = walletReady && !billingBlocked;
   const isInvoice = creationType === "invoice";
-  const selectedTypeTitle = isInvoice ? "One-time invoice" : "Reusable payment link";
+  const selectedTypeTitle = isInvoice ? "Invoice / pre-transfer" : "Reusable PayLink";
   const selectedTypeDescription = isInvoice
-    ? "Use it for a single payment. The invoice expires after a set time or after payment."
+    ? "Use it for a single payment attempt. It expires after a set time or after payment confirmation."
     : "Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.";
   const selectedAmount = amountMode === "flexible" && !isInvoice ? "Flexible amount" : `${amount || "0"} USDT`;
   const checkoutUrl = isInvoice ? "https://pay.nbcbridge.com/pay/inv_1048" : "https://pay.nbcbridge.com/link/storefront-usdt";
+  const modalTitle = created
+    ? isInvoice ? "Invoice created" : "PayLink created"
+    : isInvoice ? "Create invoice" : "Create PayLink";
+  const modalEyebrow = isInvoice ? "Invoice / pre-transfer creation" : "PayLink creation";
+  const finalCreateLabel = isInvoice ? "Create invoice" : "Create PayLink";
   const steps: { id: LinkCreationStep; label: string }[] = [
     { id: 1, label: "Type" },
     { id: 2, label: "Payment" },
@@ -1356,8 +1401,8 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
       <section aria-modal="true" className="paylink-flow-modal" role="dialog" aria-labelledby="paylink-flow-title">
         <header className="modal-header">
           <div>
-            <span className="modal-eyebrow">Paylink creation</span>
-            <h2 id="paylink-flow-title">{created ? "Payment link created" : "Create payment link"}</h2>
+            <span className="modal-eyebrow">{modalEyebrow}</span>
+            <h2 id="paylink-flow-title">{modalTitle}</h2>
           </div>
           <button className="modal-close" data-testid="close-paylink-flow" onClick={onClose} type="button" aria-label="Close create payment link flow">
             <span aria-hidden="true">x</span>
@@ -1419,7 +1464,7 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
                       type="button"
                     >
                       <Link2 size={22} aria-hidden="true" />
-                      <strong>Reusable payment link</strong>
+                      <strong>Reusable PayLink</strong>
                       <span>Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.</span>
                     </button>
                     <button
@@ -1433,8 +1478,8 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
                       type="button"
                     >
                       <FileText size={22} aria-hidden="true" />
-                      <strong>One-time invoice</strong>
-                      <span>Use it for a single payment. The invoice expires after a set time or after payment.</span>
+                      <strong>Invoice / pre-transfer</strong>
+                      <span>Use it for a single payment attempt. It expires after a set time or after payment confirmation.</span>
                     </button>
                   </div>
                 ) : null}
@@ -1498,25 +1543,16 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
                       </div>
                       <StatusPill status="verified" />
                     </button>
-                    <button className="wallet-choice" data-testid="select-secondary-receiving-wallet" type="button">
+                    <button className="wallet-choice disabled" data-testid="select-secondary-receiving-wallet" disabled type="button" aria-label="Secondary receiving wallet pending verification">
                       <div>
                         <strong>Secondary receiving wallet</strong>
-                        <span>0x91d5...1d29 / USDT · Polygon / pending verification</span>
+                        <span>0x91d5...1d29 / USDT · Polygon / pending verification · cannot be used for live payments</span>
                       </div>
                       <StatusPill status="pending" />
                     </button>
-                    <div className="wallet-add-grid">
-                      <button className="flow-choice compact" type="button">
-                        <WalletCards size={20} aria-hidden="true" />
-                        <strong>Connect in this browser</strong>
-                        <span>Use wallet signature to verify the receiving address.</span>
-                      </button>
-                      <button className="flow-choice compact" type="button">
-                        <ExternalLink size={20} aria-hidden="true" />
-                        <strong>Request remote approval</strong>
-                        <span>Enter an address and send the owner a verification request.</span>
-                      </button>
-                    </div>
+                    <Alert title="Need another receiving wallet?">
+                      Add it in the wallet verification flow first. Manual address entry creates a pending wallet and cannot be used for live payments until verified.
+                    </Alert>
                     <Alert tone="danger" title="Network safety">
                       For USDT · Polygon, use a Polygon/EVM address. Do not send TRON, Ethereum Mainnet or other networks to this payment.
                     </Alert>
@@ -1539,7 +1575,7 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
                       ]}
                     />
                     <Alert title="What will be created">
-                      {isInvoice ? "A one-time invoice will be created with a limited lifetime." : "A reusable PayLink will be created with hosted checkout, Payform and mPOS usage options."}
+                      {isInvoice ? "An Invoice / pre-transfer will be created with a fixed amount, TTL and dashboard channel." : "A reusable PayLink will be created with hosted checkout, Payform and mPOS usage options."}
                     </Alert>
                   </div>
                 ) : null}
@@ -1569,7 +1605,7 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
                 {step === 1 ? "Cancel" : "Back"}
               </Button>
               <Button disabled={!canCreate} onClick={goNext} size="md">
-                {step === 4 ? "Create" : "Continue"}
+                {step === 4 ? finalCreateLabel : "Continue"}
               </Button>
             </div>
           </>
@@ -1611,7 +1647,7 @@ function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () 
               </div>
             ) : (
               <Alert title="Invoice lifetime">
-                This one-time invoice expires in 30 minutes and closes after payment or expiration.
+                This invoice expires in 30 minutes and stays pending until backend confirms network, asset, amount, recipient and confirmations.
               </Alert>
             )}
           </section>
