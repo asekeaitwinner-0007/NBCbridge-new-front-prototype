@@ -94,6 +94,7 @@ export function SegmentedControl<T extends string>({
         <button
           aria-selected={value === item.id}
           className={value === item.id ? "selected" : ""}
+          data-testid={`segmented-${item.id}`}
           key={item.id}
           onClick={() => onChange(item.id)}
           role="tab"

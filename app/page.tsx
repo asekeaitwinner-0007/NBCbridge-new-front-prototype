@@ -46,6 +46,9 @@ type Section = "dashboard" | "payments" | "links" | "wallets" | "api" | "billing
 type ActionModal = "create" | "connect-wallet" | "add-wallet" | null;
 type Language = "en" | "ru";
 type ChartPeriod = "today" | "7d" | "30d";
+type LinkCreationStep = 1 | 2 | 3 | 4;
+type LinkCreationType = "reusable" | "invoice";
+type AmountMode = "fixed" | "flexible";
 
 const navItems: { id: Section; label: string; icon: LucideIcon; testId: string }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, testId: "nav-dashboard" },
@@ -228,8 +231,6 @@ const ruDictionary: Record<string, string> = {
   "Connect wallet before creating links": "Подключите кошелек перед созданием ссылок",
   "The link form opens after the access wallet signs the workspace message and a receiving wallet is ready.": "Форма ссылки откроется после подписи сообщения кошельком доступа и подготовки кошелька приема.",
   "Required next steps": "Следующие шаги",
-  "1. Connect access wallet": "1. Подключите кошелек доступа",
-  "2. Add receiving wallet": "2. Добавьте кошелек приема",
   "Open": "Открыть",
   "Payment details locked after first accepted payment": "Платежные детали заблокированы после первого принятого платежа",
   "Payment method rule": "Правило платежного метода",
@@ -338,7 +339,77 @@ const ruDictionary: Record<string, string> = {
   "Secondary receiving wallet": "Дополнительный кошелек приема",
   "Ethereum signature": "Подпись Ethereum",
   "Flexible": "Гибкая сумма",
-  "Open amount checkout": "Checkout с открытой суммой"
+  "Open amount checkout": "Checkout с открытой суммой",
+  "Paylink creation": "Создание PayLink",
+  "Payment link created": "Платежная ссылка создана",
+  "Close create payment link flow": "Закрыть создание платежной ссылки",
+  "Create paylink steps": "Шаги создания PayLink",
+  "Type": "Тип",
+  "Wallet": "Кошелек",
+  "Go to Type step": "Перейти к шагу выбора типа",
+  "Go to Payment step": "Перейти к шагу параметров платежа",
+  "Go to Wallet step": "Перейти к шагу кошелька",
+  "Go to Review step": "Перейти к шагу проверки",
+  "Receiving wallet required": "Нужен кошелек приема",
+  "Add a receiving wallet to create a live link.": "Добавьте кошелек приема, чтобы создать рабочую ссылку.",
+  "1. Connect access wallet": "1. Подключите кошелек доступа",
+  "2. Add receiving wallet": "2. Добавьте кошелек приема",
+  "Your free limit is used. Choose a plan to create live payments.": "Бесплатный лимит исчерпан. Выберите план, чтобы создавать рабочие платежи.",
+  "Choose plan": "Выбрать план",
+  "Select reusable payment link": "Выбрать многоразовую платежную ссылку",
+  "Reusable payment link": "Многоразовая платежная ссылка",
+  "Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.": "Подходит для сайта, повторных платежей, донатов, mPOS и платежной формы. Ссылку можно использовать повторно.",
+  "Select one-time invoice": "Выбрать разовый инвойс",
+  "One-time invoice": "Разовый инвойс",
+  "Use it for a single payment. The invoice expires after a set time or after payment.": "Подходит для одного платежа. Инвойс закрывается после оплаты или истечения срока.",
+  "Invoice name": "Название инвойса",
+  "Link name": "Название ссылки",
+  "Example: SaaS license payment": "Например: оплата SaaS-лицензии",
+  "The name is visible in the dashboard and can be shown on the checkout page if needed.": "Название видно в кабинете, при необходимости его можно показать на платежной странице.",
+  "Asset and network": "Актив и сеть",
+  "Min 1 USDT / max 10,000 USDT": "Мин. 1 USDT / макс. 10 000 USDT",
+  "The payer must send this exact asset on this exact network. Payments on another network will not be matched automatically.": "Плательщик должен отправить именно этот актив в этой сети. Платежи в другой сети не сопоставятся автоматически.",
+  "Fixed amount": "Фиксированная сумма",
+  "Flexible amount": "Гибкая сумма",
+  "The payer enters the amount. Useful for donations and mPOS, but it increases the chance of manual review.": "Плательщик вводит сумму сам. Это удобно для донатов и mPOS, но повышает шанс ручной проверки.",
+  "A fixed amount is safer for automatic payment matching.": "Фиксированная сумма надежнее для автоматического сопоставления платежа.",
+  "Invoice lifetime": "Срок действия инвойса",
+  "30 min": "30 мин",
+  "1 hour": "1 час",
+  "5 hours": "5 часов",
+  "After expiration, this invoice no longer accepts payment. The payment method itself is not deleted.": "После истечения срока инвойс больше не принимает оплату. Сам платежный метод не удаляется.",
+  "0x79c2...42aa / USDT · Polygon / added 18 Jun": "0x79c2...42aa / USDT · Polygon / добавлен 18 июня",
+  "0x91d5...1d29 / USDT · Polygon / pending verification": "0x91d5...1d29 / USDT · Polygon / ожидает проверки",
+  "Connect in this browser": "Подключить в этом браузере",
+  "Use wallet signature to verify the receiving address.": "Подпишите сообщение кошельком, чтобы подтвердить адрес приема.",
+  "Request remote approval": "Запросить удаленное подтверждение",
+  "Enter an address and send the owner a verification request.": "Введите адрес и отправьте владельцу запрос на подтверждение.",
+  "For USDT · Polygon, use a Polygon/EVM address. Do not send TRON, Ethereum Mainnet or other networks to this payment.": "Для USDT · Polygon используйте Polygon/EVM-адрес. Не отправляйте TRON, Ethereum Mainnet или другие сети на этот платеж.",
+  "Review before create": "Проверка перед созданием",
+  "Name": "Название",
+  "Amount mode": "Режим суммы",
+  "What will be created": "Что будет создано",
+  "A one-time invoice will be created with a limited lifetime.": "Будет создан разовый инвойс с ограниченным сроком действия.",
+  "A reusable PayLink will be created with hosted checkout, Payform and mPOS usage options.": "Будет создан многоразовый PayLink с hosted checkout, Payform и mPOS-сценариями.",
+  "Checkout preview": "Предпросмотр платежной страницы",
+  "Untitled payment": "Платеж без названия",
+  "Recipient": "Получатель",
+  "QR preview": "Предпросмотр QR",
+  "Payer warning": "Предупреждение плательщику",
+  "Send only the specified asset on the specified network. Payments on another network will not be matched automatically.": "Отправляйте только указанный актив в указанной сети. Платежи в другой сети не сопоставятся автоматически.",
+  "Back": "Назад",
+  "Untitled": "Без названия",
+  "Copy link": "Копировать ссылку",
+  "Open checkout": "Открыть оплату",
+  "Create another": "Создать еще",
+  "Back to links": "Вернуться к ссылкам",
+  "Paylink": "PayLink",
+  "Shareable hosted payment page.": "Публичная hosted-страница оплаты.",
+  "Payform": "Платежная форма",
+  "Embed code generated from backend link settings.": "Код встраивания формируется из настроек ссылки на backend.",
+  "mPOS": "mPOS",
+  "Terminal mode for in-person payments.": "Терминальный режим для очной оплаты.",
+  "This one-time invoice expires in 30 minutes and closes after payment or expiration.": "Этот разовый инвойс истекает через 30 минут и закрывается после оплаты или истечения срока."
 };
 
 function applyLanguage(root: HTMLElement | null, language: Language) {
@@ -1239,6 +1310,317 @@ function SecondaryScreen({ kind }: { kind: "integrations" | "api" | "billing" | 
   );
 }
 
+function PaylinkCreateFlow({ mode, onClose }: { mode: MerchantMode; onClose: () => void }) {
+  const [step, setStep] = useState<LinkCreationStep>(1);
+  const [creationType, setCreationType] = useState<LinkCreationType>("reusable");
+  const [amountMode, setAmountMode] = useState<AmountMode>("fixed");
+  const [linkName, setLinkName] = useState("SaaS license payment");
+  const [amount, setAmount] = useState("250");
+  const [created, setCreated] = useState(false);
+  const walletReady = mode !== "new";
+  const billingBlocked = mode === "attention";
+  const canCreate = walletReady && !billingBlocked;
+  const isInvoice = creationType === "invoice";
+  const selectedTypeTitle = isInvoice ? "One-time invoice" : "Reusable payment link";
+  const selectedTypeDescription = isInvoice
+    ? "Use it for a single payment. The invoice expires after a set time or after payment."
+    : "Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.";
+  const selectedAmount = amountMode === "flexible" && !isInvoice ? "Flexible amount" : `${amount || "0"} USDT`;
+  const checkoutUrl = isInvoice ? "https://pay.nbcbridge.com/pay/inv_1048" : "https://pay.nbcbridge.com/link/storefront-usdt";
+  const steps: { id: LinkCreationStep; label: string }[] = [
+    { id: 1, label: "Type" },
+    { id: 2, label: "Payment" },
+    { id: 3, label: "Wallet" },
+    { id: 4, label: "Review" }
+  ];
+
+  function goNext() {
+    if (step < 4) {
+      setStep((current) => (current + 1) as LinkCreationStep);
+      return;
+    }
+    setCreated(true);
+  }
+
+  function goBack() {
+    if (created) {
+      setCreated(false);
+      setStep(4);
+      return;
+    }
+    setStep((current) => (current > 1 ? ((current - 1) as LinkCreationStep) : current));
+  }
+
+  return (
+    <div className="modal-overlay" role="presentation">
+      <section aria-modal="true" className="paylink-flow-modal" role="dialog" aria-labelledby="paylink-flow-title">
+        <header className="modal-header">
+          <div>
+            <span className="modal-eyebrow">Paylink creation</span>
+            <h2 id="paylink-flow-title">{created ? "Payment link created" : "Create payment link"}</h2>
+          </div>
+          <button className="modal-close" data-testid="close-paylink-flow" onClick={onClose} type="button" aria-label="Close create payment link flow">
+            <span aria-hidden="true">x</span>
+          </button>
+        </header>
+
+        {!created ? (
+          <>
+            <div className="flow-stepper" aria-label="Create paylink steps">
+              {steps.map((item) => (
+                <button
+                  aria-label={`Go to ${item.label} step`}
+                  aria-current={step === item.id ? "step" : undefined}
+                  className={step === item.id ? "active" : step > item.id ? "done" : ""}
+                  data-testid={`paylink-step-${item.id}`}
+                  key={item.id}
+                  onClick={() => setStep(item.id)}
+                  type="button"
+                >
+                  <span>{item.id}</span>
+                  <strong>{item.label}</strong>
+                </button>
+              ))}
+            </div>
+
+            {!walletReady ? (
+              <section className="flow-blocked-state">
+                <Alert tone="warning" title="Receiving wallet required">
+                  Add a receiving wallet to create a live link.
+                </Alert>
+                <div className="blocked-next-steps">
+                  <span>1. Connect access wallet</span>
+                  <span>2. Add receiving wallet</span>
+                </div>
+              </section>
+            ) : null}
+
+            {billingBlocked ? (
+              <section className="flow-blocked-state">
+                <Alert tone="warning" title="Billing required">
+                  Your free limit is used. Choose a plan to create live payments.
+                </Alert>
+                <Button kind="alternative" size="md">Choose plan</Button>
+              </section>
+            ) : null}
+
+            <div className="paylink-flow-body">
+              <section className="flow-main">
+                {step === 1 ? (
+                  <div className="flow-card-grid">
+                    <button
+                      aria-label="Select reusable payment link"
+                      className={creationType === "reusable" ? "flow-choice selected" : "flow-choice"}
+                      data-testid="select-reusable-link"
+                      onClick={() => {
+                        setCreationType("reusable");
+                        if (amountMode !== "fixed") setAmountMode("flexible");
+                      }}
+                      type="button"
+                    >
+                      <Link2 size={22} aria-hidden="true" />
+                      <strong>Reusable payment link</strong>
+                      <span>Use it for websites, repeated payments, donations, mPOS and payform. The link can be reused.</span>
+                    </button>
+                    <button
+                      aria-label="Select one-time invoice"
+                      className={creationType === "invoice" ? "flow-choice selected" : "flow-choice"}
+                      data-testid="select-one-time-invoice"
+                      onClick={() => {
+                        setCreationType("invoice");
+                        setAmountMode("fixed");
+                      }}
+                      type="button"
+                    >
+                      <FileText size={22} aria-hidden="true" />
+                      <strong>One-time invoice</strong>
+                      <span>Use it for a single payment. The invoice expires after a set time or after payment.</span>
+                    </button>
+                  </div>
+                ) : null}
+
+                {step === 2 ? (
+                  <div className="flow-form-grid">
+                    <label className="flow-field">
+                      <span>{isInvoice ? "Invoice name" : "Link name"}</span>
+                      <input data-testid="paylink-name-input" onChange={(event) => setLinkName(event.target.value)} placeholder="Example: SaaS license payment" value={linkName} />
+                      <small>The name is visible in the dashboard and can be shown on the checkout page if needed.</small>
+                    </label>
+                    <div className="flow-field">
+                      <span>Asset and network</span>
+                      <button className="flow-select" data-testid="asset-network-select" type="button">
+                        <strong>USDT · Polygon</strong>
+                        <small>Min 1 USDT / max 10,000 USDT</small>
+                      </button>
+                      <small>The payer must send this exact asset on this exact network. Payments on another network will not be matched automatically.</small>
+                    </div>
+                    <div className="flow-field">
+                      <span>Amount</span>
+                      <div className="amount-mode-switch" data-testid="amount-mode-switch">
+                        <button aria-pressed={amountMode === "fixed"} className={amountMode === "fixed" ? "selected" : ""} onClick={() => setAmountMode("fixed")} type="button">
+                          Fixed amount
+                        </button>
+                        <button
+                          aria-pressed={amountMode === "flexible"}
+                          className={amountMode === "flexible" ? "selected" : ""}
+                          disabled={isInvoice}
+                          onClick={() => setAmountMode("flexible")}
+                          type="button"
+                        >
+                          Flexible amount
+                        </button>
+                      </div>
+                      {amountMode === "fixed" || isInvoice ? (
+                        <input data-testid="paylink-amount-input" inputMode="decimal" onChange={(event) => setAmount(event.target.value)} value={amount} />
+                      ) : null}
+                      <small>{amountMode === "flexible" && !isInvoice ? "The payer enters the amount. Useful for donations and mPOS, but it increases the chance of manual review." : "A fixed amount is safer for automatic payment matching."}</small>
+                    </div>
+                    {isInvoice ? (
+                      <div className="flow-field">
+                        <span>Invoice lifetime</span>
+                        <div className="lifetime-options">
+                          <button className="selected" type="button">30 min</button>
+                          <button type="button">1 hour</button>
+                          <button type="button">5 hours</button>
+                        </div>
+                        <small>After expiration, this invoice no longer accepts payment. The payment method itself is not deleted.</small>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {step === 3 ? (
+                  <div className="wallet-choice-list">
+                    <button className="wallet-choice selected" data-testid="select-default-receiving-wallet" type="button">
+                      <div>
+                        <strong>Default receiving wallet</strong>
+                        <span>0x79c2...42aa / USDT · Polygon / added 18 Jun</span>
+                      </div>
+                      <StatusPill status="verified" />
+                    </button>
+                    <button className="wallet-choice" data-testid="select-secondary-receiving-wallet" type="button">
+                      <div>
+                        <strong>Secondary receiving wallet</strong>
+                        <span>0x91d5...1d29 / USDT · Polygon / pending verification</span>
+                      </div>
+                      <StatusPill status="pending" />
+                    </button>
+                    <div className="wallet-add-grid">
+                      <button className="flow-choice compact" type="button">
+                        <WalletCards size={20} aria-hidden="true" />
+                        <strong>Connect in this browser</strong>
+                        <span>Use wallet signature to verify the receiving address.</span>
+                      </button>
+                      <button className="flow-choice compact" type="button">
+                        <ExternalLink size={20} aria-hidden="true" />
+                        <strong>Request remote approval</strong>
+                        <span>Enter an address and send the owner a verification request.</span>
+                      </button>
+                    </div>
+                    <Alert tone="danger" title="Network safety">
+                      For USDT · Polygon, use a Polygon/EVM address. Do not send TRON, Ethereum Mainnet or other networks to this payment.
+                    </Alert>
+                  </div>
+                ) : null}
+
+                {step === 4 ? (
+                  <div className="flow-summary">
+                    <TransactionDetailSection
+                      onCopy={() => undefined}
+                      title="Review before create"
+                      rows={[
+                        ["Type", selectedTypeTitle],
+                        ["Name", linkName || "Untitled"],
+                        ["Asset and network", "USDT · Polygon"],
+                        ["Amount", selectedAmount],
+                        ["Amount mode", amountMode === "flexible" && !isInvoice ? "Flexible amount" : "Fixed amount"],
+                        ["Invoice lifetime", isInvoice ? "30 min" : "Not required"],
+                        ["Receiving wallet", "0x79c2f064d44c2cbef42a", "wallet"]
+                      ]}
+                    />
+                    <Alert title="What will be created">
+                      {isInvoice ? "A one-time invoice will be created with a limited lifetime." : "A reusable PayLink will be created with hosted checkout, Payform and mPOS usage options."}
+                    </Alert>
+                  </div>
+                ) : null}
+              </section>
+
+              <aside className="flow-preview">
+                <span>Checkout preview</span>
+                <h3>{linkName || "Untitled payment"}</h3>
+                <FieldPreview label="Type" value={selectedTypeTitle} />
+                <FieldPreview label="Asset" value="USDT · Polygon" />
+                <FieldPreview label="Amount" value={selectedAmount} />
+                <FieldPreview label="Recipient" value="0x79c2...42aa" />
+                <div className="qr-preview" aria-label="QR preview">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <Alert title="Payer warning">
+                  Send only the specified asset on the specified network. Payments on another network will not be matched automatically.
+                </Alert>
+              </aside>
+            </div>
+
+            <div className="modal-actions">
+              <Button kind="secondary" onClick={step === 1 ? onClose : goBack} size="md">
+                {step === 1 ? "Cancel" : "Back"}
+              </Button>
+              <Button disabled={!canCreate} onClick={goNext} size="md">
+                {step === 4 ? "Create" : "Continue"}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <section className="flow-result">
+            <div className="result-hero">
+              <StatusPill status="active" />
+              <h3>{linkName || "Untitled payment"}</h3>
+              <p>{selectedTypeDescription}</p>
+            </div>
+            <div className="result-url">
+              <code>{checkoutUrl}</code>
+              <Button kind="secondary" size="sm" icon={Copy}>Copy link</Button>
+            </div>
+            <div className="result-actions">
+              <Button size="md" icon={ExternalLink}>Open checkout</Button>
+              <Button kind="alternative" size="md" onClick={() => {
+                setCreated(false);
+                setStep(1);
+              }}>
+                Create another
+              </Button>
+              <Button kind="secondary" size="md" onClick={onClose}>Back to links</Button>
+            </div>
+            {!isInvoice ? (
+              <div className="usage-options">
+                <article>
+                  <strong>Paylink</strong>
+                  <span>Shareable hosted payment page.</span>
+                </article>
+                <article>
+                  <strong>Payform</strong>
+                  <span>Embed code generated from backend link settings.</span>
+                </article>
+                <article>
+                  <strong>mPOS</strong>
+                  <span>Terminal mode for in-person payments.</span>
+                </article>
+              </div>
+            ) : (
+              <Alert title="Invoice lifetime">
+                This one-time invoice expires in 30 minutes and closes after payment or expiration.
+              </Alert>
+            )}
+          </section>
+        )}
+      </section>
+    </div>
+  );
+}
+
 function ActionModalView({ kind, mode, onClose }: { kind: ActionModal; mode: MerchantMode; onClose: () => void }) {
   if (!kind) {
     return null;
@@ -1246,6 +1628,10 @@ function ActionModalView({ kind, mode, onClose }: { kind: ActionModal; mode: Mer
 
   const isCreate = kind === "create";
   const isConnect = kind === "connect-wallet";
+  if (isCreate) {
+    return <PaylinkCreateFlow mode={mode} onClose={onClose} />;
+  }
+
   const title = isCreate ? "Create" : isConnect ? "Connect access wallet" : "Add receiving wallet";
   const description = isCreate
     ? "Choose the next merchant action. Payment creation is guarded until a wallet is connected."

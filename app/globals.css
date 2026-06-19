@@ -1398,6 +1398,28 @@ button {
   box-shadow: 0 24px 64px rgba(8, 16, 21, 0.18);
 }
 
+.paylink-flow-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(1040px, 100%);
+  max-height: min(840px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 32px;
+  border-radius: 28px;
+  background: var(--white);
+  box-shadow: 0 24px 64px rgba(8, 16, 21, 0.18);
+}
+
+.modal-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 120%;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -1529,6 +1551,369 @@ button {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+}
+
+.flow-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flow-stepper button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  color: var(--black-60);
+  background: var(--gray-10);
+  cursor: pointer;
+  text-align: left;
+}
+
+.flow-stepper button span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--black-60);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flow-stepper button strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 120%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flow-stepper button.active {
+  color: var(--blue);
+  background: var(--blue-10);
+}
+
+.flow-stepper button.active span,
+.flow-stepper button.done span {
+  color: var(--white);
+  background: var(--blue);
+}
+
+.paylink-flow-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 20px;
+}
+
+.flow-main,
+.flow-preview,
+.flow-blocked-state,
+.flow-result {
+  border-radius: 20px;
+  background: var(--gray-10);
+}
+
+.flow-main,
+.flow-preview,
+.flow-result {
+  padding: 20px;
+}
+
+.flow-blocked-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+}
+
+.flow-card-grid,
+.flow-form-grid,
+.wallet-choice-list,
+.flow-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.flow-card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flow-choice {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: start;
+  min-height: 126px;
+  padding: 16px;
+  border: 1px solid var(--gray-15);
+  border-radius: 16px;
+  color: var(--black-primary);
+  background: var(--white);
+  cursor: pointer;
+  text-align: left;
+}
+
+.flow-choice svg {
+  grid-row: 1 / span 2;
+  color: var(--blue);
+}
+
+.flow-choice strong {
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.flow-choice span {
+  color: var(--black-60);
+  font-size: 13px;
+  line-height: 140%;
+}
+
+.flow-choice.selected {
+  border-color: var(--blue);
+  background: var(--blue-10);
+  box-shadow: var(--shadow-blue);
+}
+
+.flow-choice.compact {
+  min-height: 94px;
+}
+
+.flow-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flow-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.flow-field > span {
+  color: var(--black-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 120%;
+}
+
+.flow-field input,
+.flow-select {
+  min-height: 46px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid var(--gray-20);
+  border-radius: 14px;
+  color: var(--black-primary);
+  background: var(--white);
+}
+
+.flow-field input {
+  outline: none;
+}
+
+.flow-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.flow-select strong,
+.flow-select small {
+  display: block;
+}
+
+.flow-field small,
+.flow-select small {
+  color: var(--black-60);
+  font-size: 12px;
+  line-height: 140%;
+}
+
+.amount-mode-switch,
+.lifetime-options {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.lifetime-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.amount-mode-switch button,
+.lifetime-options button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: var(--black-60);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.amount-mode-switch button.selected,
+.lifetime-options button.selected {
+  color: var(--white);
+  background: var(--blue);
+}
+
+.amount-mode-switch button:disabled {
+  color: var(--black-20);
+  cursor: not-allowed;
+}
+
+.wallet-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+  padding: 14px;
+  border: 1px solid var(--gray-15);
+  border-radius: 16px;
+  background: var(--white);
+  cursor: pointer;
+  text-align: left;
+}
+
+.wallet-choice.selected {
+  border-color: var(--blue);
+  background: var(--blue-10);
+}
+
+.wallet-choice strong,
+.wallet-choice span {
+  display: block;
+}
+
+.wallet-choice span {
+  margin-top: 4px;
+  color: var(--black-60);
+  font-size: 12px;
+}
+
+.wallet-add-grid,
+.usage-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.flow-preview {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flow-preview > span {
+  color: var(--black-60);
+  font-size: 12px;
+}
+
+.flow-preview h3 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 120%;
+}
+
+.qr-preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  width: 108px;
+  height: 108px;
+  margin: 8px auto;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--white);
+}
+
+.qr-preview span {
+  border-radius: 6px;
+  background: var(--black-primary);
+}
+
+.flow-result {
+  display: grid;
+  gap: 16px;
+}
+
+.result-hero h3 {
+  margin: 12px 0 8px;
+  font-size: 24px;
+  line-height: 120%;
+}
+
+.result-hero p {
+  margin: 0;
+  color: var(--black-60);
+  font-size: 14px;
+  line-height: 140%;
+}
+
+.result-url {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.result-url code {
+  overflow: hidden;
+  color: var(--black-primary);
+  font-family: "Commissioner", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.usage-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.usage-options article {
+  min-height: 96px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.usage-options strong,
+.usage-options span {
+  display: block;
+}
+
+.usage-options span {
+  margin-top: 8px;
+  color: var(--black-60);
+  font-size: 12px;
+  line-height: 140%;
 }
 
 .action-card {
@@ -1748,6 +2133,26 @@ button {
     border-radius: 14px;
     background: var(--gray-10);
   }
+
+  .paylink-flow-modal {
+    width: min(100%, 760px);
+    max-height: calc(100vh - 32px);
+  }
+
+  .paylink-flow-body {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-preview {
+    position: static;
+  }
+
+  .flow-card-grid,
+  .flow-form-grid,
+  .wallet-add-grid,
+  .usage-options {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -1869,6 +2274,64 @@ button {
     max-height: calc(100vh - 24px);
     padding: 24px;
     border-radius: 24px;
+  }
+
+  .paylink-flow-modal {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .flow-stepper {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+  }
+
+  .flow-stepper button {
+    justify-content: center;
+    min-height: 48px;
+    padding: 6px;
+  }
+
+  .flow-stepper button strong {
+    display: none;
+  }
+
+  .flow-blocked-state {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .flow-main,
+  .flow-preview,
+  .flow-result {
+    padding: 16px;
+  }
+
+  .flow-choice,
+  .wallet-choice {
+    border-radius: 14px;
+  }
+
+  .wallet-choice {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flow-select {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 14px;
+  }
+
+  .result-url {
+    grid-template-columns: 1fr;
+  }
+
+  .result-url .btn,
+  .result-actions .btn {
+    width: 100%;
   }
 
   .modal-actions {
