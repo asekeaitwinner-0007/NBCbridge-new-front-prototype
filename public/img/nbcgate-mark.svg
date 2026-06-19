@@ -1,0 +1,21 @@
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#blur)">
+    <ellipse cx="14" cy="18" rx="4.5" ry="14" fill="url(#blue)" />
+    <ellipse cx="22" cy="18" rx="4.5" ry="14" fill="url(#pink)" />
+  </g>
+  <ellipse cx="14" cy="18" rx="4.5" ry="14" fill="url(#blue)" />
+  <ellipse cx="22" cy="18" rx="4.5" ry="14" fill="url(#pink)" />
+  <defs>
+    <filter id="blur" x="2" y="0" width="32" height="36" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3" />
+    </filter>
+    <linearGradient id="blue" x1="14" y1="4" x2="14" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37F5FE" />
+      <stop offset="1" stop-color="#219BFF" />
+    </linearGradient>
+    <linearGradient id="pink" x1="22" y1="4" x2="22" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FE0FFF" />
+      <stop offset="1" stop-color="#BB00E9" />
+    </linearGradient>
+  </defs>
+</svg>
