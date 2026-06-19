@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -44,10 +44,272 @@ const tabs: { id: MerchantMode; label: string }[] = [
 
 type Section = "dashboard" | "payments" | "links" | "wallets" | "integrations" | "api" | "settings";
 type ActionModal = "create" | "connect-wallet" | "add-wallet" | null;
+type Language = "en" | "ru";
+
+const textOriginals = new WeakMap<Text, string>();
+const attrOriginals = new WeakMap<Element, Record<string, string>>();
+
+const ruDictionary: Record<string, string> = {
+  "Dashboard": "Дашборд",
+  "Payments": "Платежи",
+  "Links": "Ссылки",
+  "Wallets": "Кошельки",
+  "More": "Еще",
+  "Integrations": "Интеграции",
+  "API keys": "API-ключи",
+  "Settings": "Настройки",
+  "Create": "Создать",
+  "New": "Новый",
+  "Ready": "Готов",
+  "Active": "Активен",
+  "Attention": "Внимание",
+  "Merchant dashboard logic prototype": "Прототип логики кабинета мерчанта",
+  "Your merchant workspace is ready. Turn on payment acceptance in 3 steps.": "Ваш кабинет мерчанта готов. Включите прием платежей за 3 шага.",
+  "Wallets are ready. Create the first payment method and share checkout.": "Кошельки готовы. Создайте первый платежный метод и отправьте checkout.",
+  "Payments are live. Two operational items need a decision.": "Платежи работают. Два операционных вопроса требуют решения.",
+  "Payments are live. Track money movement and create the next checkout quickly.": "Платежи работают. Отслеживайте движение средств и быстро создавайте новый checkout.",
+  "Payments show what arrived, what is pending, and what needs review.": "Платежи показывают, что поступило, что ожидает и что требует проверки.",
+  "Create and manage checkout links without turning setup into registration.": "Создавайте и управляйте checkout-ссылками без превращения настройки в регистрацию.",
+  "Wallet roles are explicit: access wallet and receiving wallets are not the same thing.": "Роли кошельков явные: кошелек доступа и кошельки приема платежей - не одно и то же.",
+  "Integrations stay secondary until the merchant is ready for API or plugin work.": "Интеграции остаются вторичными, пока мерчант не готов к API или плагинам.",
+  "API keys are powerful, but they should not distract from the first direct payment.": "API-ключи важны, но не должны отвлекать от первого прямого платежа.",
+  "Settings hold preferences and optional customer-facing display details.": "В настройках находятся предпочтения и опциональные данные, видимые клиенту.",
+  "Prototype controls": "Контролы прототипа",
+  "Merchant state: New": "Состояние мерчанта: Новый",
+  "Merchant state: Ready": "Состояние мерчанта: Готов",
+  "Merchant state: Active": "Состояние мерчанта: Активен",
+  "Merchant state: Attention": "Состояние мерчанта: Внимание",
+  "This switcher is only for reviewing dashboard states before backend state is connected.": "Этот переключатель нужен только для просмотра состояний кабинета до подключения backend-состояния.",
+  "Setup guide": "Гайд настройки",
+  "Start accepting direct payments": "Начните принимать прямые платежи",
+  "Connect access wallet": "Подключите кошелек доступа",
+  "Use a signature to enter the workspace. No business profile is required.": "Подпишите сообщение, чтобы войти в кабинет. Бизнес-профиль не требуется.",
+  "Create payment link": "Создайте платежную ссылку",
+  "Choose network, currency and fixed amount. Company name stays optional.": "Выберите сеть, валюту и фиксированную сумму. Название компании остается опциональным.",
+  "Share and receive": "Отправьте и примите платеж",
+  "Copy a hosted checkout link or QR after the payment method is created.": "Скопируйте hosted checkout ссылку или QR после создания платежного метода.",
+  "Continue": "Продолжить",
+  "Done": "Готово",
+  "Locked": "Заблокировано",
+  "Wallet-first onboarding": "Онбординг через кошелек",
+  "The cabinet opens first. Wallet signature is the identity layer; company name is only a checkout display option.": "Сначала открывается кабинет. Подпись кошельком - слой идентификации; название компании только опция отображения в checkout.",
+  "Access wallet connected": "Кошелек доступа подключен",
+  "0x79c2...42aa is the workspace access key.": "0x79c2...42aa - ключ доступа к кабинету.",
+  "Create first payment link": "Создайте первую платежную ссылку",
+  "A verified receiving wallet is ready for Polygon USDT.": "Проверенный кошелек приема готов для Polygon USDT.",
+  "Receive first payment": "Получите первый платеж",
+  "Payments will appear in recent activity after checkout is shared.": "Платежи появятся в недавней активности после отправки checkout.",
+  "Workspace live": "Кабинет активен",
+  "Wallet roles are configured and payment methods are active.": "Роли кошельков настроены, платежные методы активны.",
+  "Links accepting payments": "Ссылки принимают платежи",
+  "4 active links route payments to verified receiving wallets.": "4 активные ссылки направляют платежи на проверенные кошельки приема.",
+  "Operations running": "Операции работают",
+  "Monitor and webhooks are reporting without unresolved issues.": "Мониторинг и webhooks работают без нерешенных проблем.",
+  "Payment acceptance is enabled, but two items require action.": "Прием платежей включен, но два пункта требуют действия.",
+  "Resolve pending payment": "Разберите ожидающий платеж",
+  "One invoice has been pending longer than expected.": "Один invoice ожидает дольше обычного.",
+  "Review receiving wallet": "Проверьте кошелек приема",
+  "A new wallet verification request expires in 24 minutes.": "Новый запрос проверки кошелька истекает через 24 минуты.",
+  "Today volume": "Оборот сегодня",
+  "7 day volume": "Оборот за 7 дней",
+  "Active links": "Активные ссылки",
+  "Pending amount": "Сумма в ожидании",
+  "+18% vs yesterday": "+18% к вчерашнему дню",
+  "+11% vs previous": "+11% к прошлому периоду",
+  "2 used today": "2 использованы сегодня",
+  "Needs action": "Требует действия",
+  "Clear": "Чисто",
+  "Volume": "Оборот",
+  "Direct payments trend": "Динамика прямых платежей",
+  "7 days": "7 дней",
+  "Operations": "Операции",
+  "What happens next": "Что дальше",
+  "Needs attention": "Требует внимания",
+  "View all": "Смотреть все",
+  "Pending invoice is aging": "Invoice долго в ожидании",
+  "Order 1042 has no detected transfer after 34 minutes.": "По заказу 1042 перевод не найден уже 34 минуты.",
+  "Wallet verification expires soon": "Проверка кошелька скоро истечет",
+  "Receiving wallet 0x91d5...1d29 needs a signature to stay usable.": "Кошельку приема 0x91d5...1d29 нужна подпись, чтобы остаться доступным.",
+  "Webhook delivery recovered": "Доставка webhook восстановлена",
+  "Last retry was delivered. Keep this item visible until the next clean event.": "Последняя повторная отправка доставлена. Оставьте пункт видимым до следующего чистого события.",
+  "No action required": "Действия не требуются",
+  "Open payments and wallet verifications are clear.": "Открытые платежи и проверки кошельков чистые.",
+  "Transactions": "Транзакции",
+  "Recent payments": "Недавние платежи",
+  "Status": "Статус",
+  "Currency": "Валюта",
+  "Date": "Дата",
+  "Product": "Продукт",
+  "Network": "Сеть",
+  "TX hash": "TX hash",
+  "Amount": "Сумма",
+  "No real payments yet": "Реальных платежей пока нет",
+  "After the first checkout payment, this area becomes the operating transaction table.": "После первого checkout-платежа этот блок станет рабочей таблицей транзакций.",
+  "Waiting": "Ожидание",
+  "Payment workbench": "Рабочая зона платежей",
+  "Fast filters": "Быстрые фильтры",
+  "Operational intent": "Операционный смысл",
+  "This screen answers whether money arrived, what is pending, and which payments require manual review.": "Этот экран отвечает, поступили ли деньги, что ожидает и какие платежи требуют ручной проверки.",
+  "Transaction information": "Информация о транзакции",
+  "Seller information": "Информация продавца",
+  "Payer information": "Информация плательщика",
+  "Transaction type": "Тип транзакции",
+  "Payment": "Платеж",
+  "Receiver wallet": "Кошелек получателя",
+  "Payer wallet": "Кошелек плательщика",
+  "Waiting for transfer": "Ожидаем перевод",
+  "Date and time": "Дата и время",
+  "Copied": "Скопировано",
+  "Payment links": "Платежные ссылки",
+  "Create checkout without a business registration gate": "Создавайте checkout без обязательной бизнес-регистрации",
+  "New link": "Новая ссылка",
+  "Connect wallet before creating links": "Подключите кошелек перед созданием ссылок",
+  "The link form opens after the access wallet signs the workspace message.": "Форма ссылки откроется после подписи сообщения кошельком доступа.",
+  "Open": "Открыть",
+  "Optional display": "Опциональное отображение",
+  "Customer trust": "Доверие клиента",
+  "Company name": "Название компании",
+  "Receipt contact": "Контакт для чека",
+  "Optional": "Опционально",
+  "These fields improve checkout clarity but never block direct payment creation.": "Эти поля делают checkout понятнее, но никогда не блокируют создание прямого платежа.",
+  "Wallet roles": "Роли кошельков",
+  "Access and receiving wallets": "Кошелек доступа и кошельки приема",
+  "Add receiving wallet": "Добавить кошелек приема",
+  "Access wallet": "Кошелек доступа",
+  "Not connected": "Не подключен",
+  "This wallet signs in and controls workspace access. It does not have to be the same address that receives payments.": "Этот кошелек входит в кабинет и управляет доступом. Он не обязан совпадать с адресом приема платежей.",
+  "Connect wallet": "Подключить кошелек",
+  "Connected": "Подключен",
+  "Default receiving wallet": "Кошелек приема по умолчанию",
+  "Missing": "Не задан",
+  "New payment links use the verified default wallet for the selected network and currency.": "Новые платежные ссылки используют проверенный кошелек по умолчанию для выбранной сети и валюты.",
+  "Set default": "Сделать основным",
+  "Role": "Роль",
+  "Address": "Адрес",
+  "No wallets yet": "Кошельков пока нет",
+  "The first signature creates the access wallet. Add a receiving wallet before creating live payment links.": "Первая подпись создает кошелек доступа. Добавьте кошелек приема перед созданием live-ссылок.",
+  "Verify": "Проверить",
+  "Manage": "Управлять",
+  "Wallet rule": "Правило кошельков",
+  "Roles are explicit": "Роли явные",
+  "Same wallet is allowed": "Один кошелек допустим",
+  "A single address can be both access wallet and receiving wallet, but the UI must say which roles it has.": "Один адрес может быть и кошельком доступа, и кошельком приема, но UI должен явно показывать его роли.",
+  "Network safety": "Безопасность сети",
+  "Receiving wallets are network-specific. Wrong network deposits are treated as high-risk irreversible errors.": "Кошельки приема привязаны к сети. Депозиты в неверной сети считаются высокорисковыми необратимыми ошибками.",
+  "Connect stores and webhooks after direct payments are ready": "Подключайте магазины и webhooks после готовности прямых платежей",
+  "CMS plugins, webhook destinations and hosted checkout snippets live here. They stay out of the first-run path.": "CMS-плагины, webhook-адреса и hosted checkout snippets находятся здесь. Они не мешают первому запуску.",
+  "Webhook endpoint": "Webhook endpoint",
+  "Optional delivery URL for payment events.": "Опциональный URL доставки событий платежей.",
+  "WooCommerce plugin": "Плагин WooCommerce",
+  "Install path for merchants who want CMS checkout.": "Путь установки для мерчантов, которым нужен CMS checkout.",
+  "Hosted checkout": "Hosted checkout",
+  "Snippet and pay URL configuration.": "Настройки snippet и pay URL.",
+  "API access is powerful, but not required for the first payment": "API-доступ мощный, но не нужен для первого платежа",
+  "Keys are created after the merchant understands direct links. Usage metadata should show last path, method and status.": "Ключи создаются после того, как мерчант понял прямые ссылки. Метаданные использования должны показывать последний path, method и status.",
+  "Live key": "Live key",
+  "Test key": "Test key",
+  "not used": "не использовался",
+  "Idempotency": "Идемпотентность",
+  "Document key behavior near invoice creation.": "Опишите поведение ключей рядом с созданием invoice.",
+  "Preferences and customer-facing display details": "Предпочтения и данные, видимые клиенту",
+  "Keep settings quiet. Business fields remain optional checkout presentation, not mandatory onboarding.": "Настройки должны быть спокойными. Бизнес-поля остаются опцией отображения в checkout, а не обязательным онбордингом.",
+  "Language": "Язык",
+  "English / Russian": "Английский / русский",
+  "Checkout display": "Отображение checkout",
+  "Company name, logo, support contact.": "Название компании, логотип, контакт поддержки.",
+  "Notifications": "Уведомления",
+  "Operational alerts and billing notices.": "Операционные алерты и billing-уведомления.",
+  "Choose the next merchant action. Payment creation is guarded until a wallet is connected.": "Выберите следующее действие мерчанта. Создание платежей закрыто, пока кошелек не подключен.",
+  "Sign a message to enter the workspace. This does not transfer funds or grant spending permission.": "Подпишите сообщение для входа в кабинет. Это не переводит средства и не дает разрешение на списание.",
+  "Receiving wallets are network-specific and require explicit verification before live payment routing.": "Кошельки приема привязаны к сети и требуют явной проверки перед live-маршрутизацией платежей.",
+  "Payment link": "Платежная ссылка",
+  "Fixed or flexible hosted checkout link.": "Hosted checkout ссылка с фиксированной или гибкой суммой.",
+  "Invoice": "Invoice",
+  "One-off payment request with amount and expiry.": "Разовый платежный запрос с суммой и сроком.",
+  "Receiving wallet": "Кошелек приема",
+  "Add a network-specific destination address.": "Добавьте адрес назначения для конкретной сети.",
+  "Signature type": "Тип подписи",
+  "Access only": "Только доступ",
+  "Permission": "Разрешение",
+  "No spending": "Без списания",
+  "Asset": "Актив",
+  "Non-custodial access": "Non-custodial доступ",
+  "The wallet signs a message to prove ownership. Funds stay in the merchant wallet.": "Кошелек подписывает сообщение для подтверждения владения. Средства остаются в кошельке мерчанта.",
+  "Send only the selected asset on the selected network to this address.": "Отправляйте на этот адрес только выбранный актив в выбранной сети.",
+  "Cancel": "Отмена",
+  "Sign message": "Подписать сообщение",
+  "Start verification": "Начать проверку",
+  "Primary action": "Основное действие",
+  "Connect wallet first": "Сначала подключите кошелек",
+  "Payment links are guarded until a wallet signs the workspace access message.": "Платежные ссылки закрыты, пока кошелек не подпишет сообщение доступа к кабинету.",
+  "No wallet connected": "Кошелек не подключен",
+  "The first signature creates an access wallet. Receiving wallets can be added later.": "Первая подпись создает кошелек доступа. Кошельки приема можно добавить позже.",
+  "Send only USDT on Polygon to a Polygon receiving wallet. Other assets or networks can be lost.": "Отправляйте только USDT в Polygon на Polygon-кошелек приема. Другие активы или сети могут быть потеряны.",
+  "Shown on": "Показывается в",
+  "Checkout and receipt": "Checkout и чек",
+  "This is not a registration requirement. It only improves customer trust on payment pages.": "Это не требование регистрации. Это только повышает доверие клиента на платежных страницах.",
+  "Confirmed": "Подтвержден",
+  "Pending": "Ожидает",
+  "Expired": "Истек",
+  "Review": "Проверка",
+  "Verified": "Проверен",
+  "Warning": "Предупреждение",
+  "Action": "Действие",
+  "Info": "Инфо",
+  "Secondary receiving wallet": "Дополнительный кошелек приема",
+  "Ethereum signature": "Подпись Ethereum",
+  "Flexible": "Гибкая сумма",
+  "Open amount checkout": "Checkout с открытой суммой"
+};
+
+function applyLanguage(root: HTMLElement | null, language: Language) {
+  if (!root) return;
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let textNode = walker.nextNode() as Text | null;
+
+  while (textNode) {
+    let original = textOriginals.get(textNode) ?? textNode.nodeValue ?? "";
+    const current = textNode.nodeValue ?? "";
+    const translatedOriginal = ruDictionary[original.trim()]
+      ? original.replace(original.trim(), ruDictionary[original.trim()])
+      : original;
+    if (current !== original && current !== translatedOriginal) {
+      original = current;
+      textOriginals.set(textNode, original);
+    }
+    if (!textOriginals.has(textNode)) {
+      textOriginals.set(textNode, original);
+    }
+    const trimmed = original.trim();
+    if (trimmed) {
+      textNode.nodeValue = language === "ru" && ruDictionary[trimmed]
+        ? original.replace(trimmed, ruDictionary[trimmed])
+        : original;
+    }
+    textNode = walker.nextNode() as Text | null;
+  }
+
+  root.querySelectorAll<HTMLElement>("*").forEach((element) => {
+    const originals = attrOriginals.get(element) ?? {};
+    ["aria-label", "title"].forEach((attr) => {
+      const current = element.getAttribute(attr);
+      if (!current) return;
+      const translatedOriginal = originals[attr] && ruDictionary[originals[attr]] ? ruDictionary[originals[attr]] : originals[attr];
+      if (!originals[attr] || (current !== originals[attr] && current !== translatedOriginal)) {
+        originals[attr] = current;
+        attrOriginals.set(element, originals);
+      }
+      const original = originals[attr];
+      element.setAttribute(attr, language === "ru" && ruDictionary[original] ? ruDictionary[original] : original);
+    });
+  });
+}
 
 export default function MerchantDashboardPrototype() {
   const [mode, setMode] = useState<MerchantMode>("new");
   const [section, setSection] = useState<Section>("dashboard");
+  const [language, setLanguage] = useState<Language>("en");
   const [selectedPayment, setSelectedPayment] = useState<PaymentRow | null>(null);
   const [actionModal, setActionModal] = useState<ActionModal>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
@@ -68,9 +330,20 @@ export default function MerchantDashboardPrototype() {
     return "Payments are live. Track money movement and create the next checkout quickly.";
   }, [mode, section]);
 
+  useEffect(() => {
+    window.requestAnimationFrame(() => applyLanguage(document.querySelector(".app-shell"), language));
+  }, [language, mode, section, selectedPayment, actionModal, copyToast]);
+
   return (
     <div className="app-shell">
-      <Header mode={mode} section={section} onCreate={() => setActionModal("create")} onSectionChange={setSection} />
+      <Header
+        language={language}
+        mode={mode}
+        onCreate={() => setActionModal("create")}
+        onLanguageChange={setLanguage}
+        onSectionChange={setSection}
+        section={section}
+      />
       <main className="page">
         <section className="hero-band">
           <div>
@@ -133,14 +406,18 @@ function PrototypeControls({
 }
 
 function Header({
+  language,
   mode,
   section,
   onCreate,
+  onLanguageChange,
   onSectionChange
 }: {
+  language: Language;
   mode: MerchantMode;
   section: Section;
   onCreate: () => void;
+  onLanguageChange: (language: Language) => void;
   onSectionChange: (section: Section) => void;
 }) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -214,6 +491,14 @@ function Header({
           </div>
         </nav>
         <div className="topbar-actions">
+          <div className="language-switch" aria-label="Language">
+            <button className={language === "en" ? "selected" : ""} onClick={() => onLanguageChange("en")} type="button">
+              EN
+            </button>
+            <button className={language === "ru" ? "selected" : ""} onClick={() => onLanguageChange("ru")} type="button">
+              RU
+            </button>
+          </div>
           <span className={`workspace-state workspace-${mode}`}>{modeLabels[mode]}</span>
           <Button icon={Plus} onClick={onCreate} size="md">
             Create
